@@ -1,0 +1,20 @@
+image: gcc
+before_script:
+  - apt-get update -y
+  - apt-get install -y --no-install-recommends build-essential cmake
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - cmake -S . -B build
+    - cmake --build build
+
+test:
+  stage: test
+  script:
+    - cd build/test/src/
+    - ctest
