@@ -18,7 +18,7 @@ void help(std::string name, std::string command) {
     info() << "\n\t-a\n\t\tThe address to bind to (default " << LOCALHOST
            << ")\n";
     info()
-        << "\n\t-f\n\t\tFollow the lifcycle of the machine (default false)\n";
+        << "\n\t-f\n\t\tFollow the lifecycle of the machine (default false)\n";
     info() << "Parameters;";
     info() << "\n\tbinary\n\t\tThe machine binary to start\n";
     info() << "\n\thost\n\t\tThe host to start the machine on\n";
