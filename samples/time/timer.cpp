@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+    error() << "Incorrect parameters, expected <spawner> <address> <duration>\n"
             << std::flush;
     return -1;
   }
@@ -15,9 +15,12 @@ int main(int argc, char **argv) {
   Address spawner(argv[1]);
   Address address(argv[2]);
   UDPSocket socket;
-  Machine m(spawner, address, "timer/Timer", socket);
+  Machine m(spawner, address, "time/Timer", socket);
 
-  std::time_t start;
+  std::istringstream iss(argv[3]);
+  int seconds;
+  iss >> seconds;
+  std::time_t start = std::time(nullptr);
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -38,8 +41,8 @@ int main(int argc, char **argv) {
              start = std::time(nullptr);
              m.GotoState("timing");
            }},
-          {"stop", [&](const Address &sender,
-                       std::istream &args) { m.GotoState("idle"); }},
+          {"stop",
+           [&](const Address &sender, std::istream &args) { m.Exit(); }},
           {"exit",
            [&](const Address &sender, std::istream &args) { m.Exit(); }},
       }));
@@ -50,22 +53,23 @@ int main(int argc, char **argv) {
       // Parent State
       "",
       // On Entry Action
-      []() { info() << "Timer has STARTED\n"
-                    << std::flush; },
+      [&]() {
+        const auto now = std::time(nullptr);
+        const auto elapsed = now - start;
+        info() << "Timer is TIMING: "<<elapsed<<'\n' << std::flush;
+        if (elapsed < seconds) {
+          sleep(1);
+          m.GotoState("timing"); // Loop
+        } else {
+          m.SendSpawner("timeup");
+          m.Exit();
+        }
+      },
       // On Exit Action
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
-          {"stop",
-           [&](const Address &sender, std::istream &args) {
-             std::time_t now = std::time(nullptr);
-             std::ostringstream oss;
-             oss << "elapsed ";
-             oss << (now - start);
-             m.Send(sender, oss.str());
-             m.GotoState("idle");
-           }},
       }));
 
-  m.Start();
+  m.Start("timing");
 }

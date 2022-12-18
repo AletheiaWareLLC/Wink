@@ -24,7 +24,7 @@ services:
       - -c
       - |
         sleep 1
-        ./build/src/Wink start -a 10.0.0.4:42001 timer/Timer 10.0.0.2:64001
+        ./build/src/Wink start -a 10.0.0.4:42001 time/StopWatch 10.0.0.2:64001
         ./build/src/Wink send 10.0.0.2:64001 idle
         ./build/src/Wink send 10.0.0.2:64001 start
         ./build/src/Wink send 10.0.0.2:64001 stop
@@ -32,6 +32,8 @@ services:
         sleep 1
         ./build/src/Wink send 10.0.0.2:64001 stop
         ./build/src/Wink send 10.0.0.2:64001 exit
+
+        ./build/src/Wink start -a 10.0.0.4:42001 -f true time/Timer 10.0.0.2:64001 5
     expose:
       - "42001:42001/udp"
     networks:
