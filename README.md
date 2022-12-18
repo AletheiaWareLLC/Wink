@@ -2,14 +2,14 @@
 
 Wink is framework for developing Fault Tolerant Systems with Asynchronous Concurrent Independent Hierarchical Finite State Machine.
 
-## Finite State Machine
+## State Machine
 
-A Finite State Machine;
+A State Machine;
 - Has a Hierarchy of States to minimize Code Duplication.
 - Runs Independently and Concurrently for Fault Isolation.
 - Communicates Asynchronously to minimize Latency and maximize Throughput.
 - Monitors Lifecycle with a Supervision Tree.
-- Is uniquely identified by its Binary Name and Network Address;
+- Is Uniquely Identified by its Binary Name and Network Address;
   - local `:<port>` or `localhost:<port>` or `127.0.0.1:<port>`
   - remote `<ip>:<port>`
 
@@ -102,7 +102,6 @@ cmake --build build
 
 ```
 (cd build/test/src && ctest)
-(cd build/test/samples && ctest)
 ```
 
 ## Docker
