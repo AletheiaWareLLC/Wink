@@ -15,7 +15,10 @@ void help(std::string name, std::string command) {
   if (command == "start") {
     info() << "Start a new machine.\n\n";
     info() << "Options;";
-    // info() << "\n\t--test\n\t\tTest (default 5)\n";
+    info() << "\n\t-a\n\t\tThe address to bind to (default " << LOCALHOST
+           << ")\n";
+    info()
+        << "\n\t-f\n\t\tFollow the lifcycle of the machine (default false)\n";
     info() << "Parameters;";
     info() << "\n\tbinary\n\t\tThe machine binary to start\n";
     info() << "\n\thost\n\t\tThe host to start the machine on\n";
@@ -94,12 +97,16 @@ int main(int argc, char **argv) {
 
   if (command == "start") {
     Address address(LOCALHOST, 0);
+    bool follow = false;
 
     // Parse Options
     for (const auto &[k, v] : options) {
       if (k == "-a") {
         std::stringstream ss(v);
         ss >> address;
+      } else if (k == "-f") {
+        std::stringstream ss(v);
+        ss >> follow;
       } else {
         error() << "Option " << k << ":" << v << " not supported\n"
                 << std::flush;
@@ -129,7 +136,7 @@ int main(int argc, char **argv) {
 
     UDPSocket socket;
     if (const auto result =
-            StartMachine(socket, address, binary, destination, args, true);
+            StartMachine(socket, address, binary, destination, args, follow);
         result < 0) {
       return result;
     }

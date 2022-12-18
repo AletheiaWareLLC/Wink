@@ -24,7 +24,7 @@ services:
       - -c
       - |
         sleep 1
-        ./build/src/Wink start -a 10.0.0.4:42001 family/Parent 10.0.0.2:64001
+        ./build/src/Wink start -a 10.0.0.4:42001 -f true family/Parent 10.0.0.2:64001
     expose:
       - "42001:42001/udp"
     networks:
