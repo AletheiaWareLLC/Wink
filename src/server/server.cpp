@@ -199,8 +199,6 @@ int Server::Stop(int port) {
     // remove port from machines and pids maps
     machines.erase(port);
     pids.erase(port);
-  } else {
-    error() << "Unrecognized port " << port << '\n' << std::flush;
   }
-  return 0;
+  return pid;
 }
