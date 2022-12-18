@@ -31,13 +31,15 @@ int main(int argc, char **argv) {
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
-          {"idle", [&](const Address &sender, std::istream &args) {}},
+          {"idle", [&](const Address &sender,
+                       std::istream &args) { m.GotoState("idle"); }},
           {"start",
            [&](const Address &sender, std::istream &args) {
              start = std::time(nullptr);
              m.GotoState("timing");
            }},
-          {"stop", [&](const Address &sender, std::istream &args) {}},
+          {"stop", [&](const Address &sender,
+                       std::istream &args) { m.GotoState("idle"); }},
           {"exit",
            [&](const Address &sender, std::istream &args) { m.Exit(); }},
       }));
@@ -54,8 +56,6 @@ int main(int argc, char **argv) {
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
-          {"idle", [&](const Address &sender,
-                       std::istream &args) { m.GotoState("idle"); }},
           {"stop",
            [&](const Address &sender, std::istream &args) {
              std::time_t now = std::time(nullptr);
