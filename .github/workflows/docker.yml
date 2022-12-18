@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image
 
 on:
   push:
@@ -7,13 +7,10 @@ on:
     branches: [ "master" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag wink:$(date +%s)
+      run: docker build . --tag wink:latest
