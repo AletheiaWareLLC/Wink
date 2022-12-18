@@ -3,7 +3,7 @@ FROM ubuntu:latest
 EXPOSE 42000/udp
 
 RUN apt-get update -y
-RUN apt-get install -y --no-install-recommends build-essential cmake nmap
+RUN apt-get install -y --no-install-recommends build-essential cmake
 
 COPY ./include /Wink/include
 COPY ./samples /Wink/samples

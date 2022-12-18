@@ -1,16 +1,16 @@
 # Wink
 
-Wink is framework for developing fault tolerant systems.
+Wink is framework for developing Fault Tolerant Systems with Asynchronous Concurrent Independent Hierarchical Finite State Machine.
 
-## Finite State Machine
+## State Machine
 
-A Finite State Machine;
-- Has a Hierarchy of States
-- Runs Independantly and Concurrently
-- Communicates Asynchronously
-- Monitors Lifecycle with a Supervision Tree
-- Is uniquely identified by its name and address;
-  - local `:<port>` or `127.0.0.1:<port>`
+A State Machine;
+- Has a Hierarchy of States to minimize Code Duplication.
+- Runs Independently and Concurrently for Fault Isolation.
+- Communicates Asynchronously to minimize Latency and maximize Throughput.
+- Monitors Lifecycle with a Supervision Tree.
+- Is Uniquely Identified by its Binary Name and Network Address;
+  - local `:<port>` or `localhost:<port>` or `127.0.0.1:<port>`
   - remote `<ip>:<port>`
 
 ### States
@@ -63,25 +63,22 @@ int main(int argc, char **argv) {
       std::map<const std::string, Receiver>{
           {"on", [&](const Address &sender,
                      std::istream &args) { m.GotoState("on"); }},
-          {"off", [&](const Address &sender, std::istream &args) {}},
+          {"off", [&](const Address &sender,
+                      std::istream &args) { m.GotoState("off"); }},
       }));
 
   m.AddState(std::make_unique<State>(
       // State Name
       "on",
       // Parent State
-      "",
+      "off",
       // On Entry Action
       []() { info() << "Switch is ON\n"
                     << std::flush; },
       // On Exit Action
       []() {},
       // Receivers
-      std::map<const std::string, Receiver>{
-          {"on", [&](const Address &sender, std::istream &args) {}},
-          {"off", [&](const Address &sender,
-                      std::istream &args) { m.GotoState("off"); }},
-      }));
+      std::map<const std::string, Receiver>{}));
 
   m.Start();
 }
@@ -105,7 +102,6 @@ cmake --build build
 
 ```
 (cd build/test/src && ctest)
-(cd build/test/samples && ctest)
 ```
 
 ## Docker
