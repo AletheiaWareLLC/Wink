@@ -63,25 +63,22 @@ int main(int argc, char **argv) {
       std::map<const std::string, Receiver>{
           {"on", [&](const Address &sender,
                      std::istream &args) { m.GotoState("on"); }},
-          {"off", [&](const Address &sender, std::istream &args) {}},
+          {"off", [&](const Address &sender,
+                      std::istream &args) { m.GotoState("off"); }},
       }));
 
   m.AddState(std::make_unique<State>(
       // State Name
       "on",
       // Parent State
-      "",
+      "off",
       // On Entry Action
       []() { info() << "Switch is ON\n"
                     << std::flush; },
       // On Exit Action
       []() {},
       // Receivers
-      std::map<const std::string, Receiver>{
-          {"on", [&](const Address &sender, std::istream &args) {}},
-          {"off", [&](const Address &sender,
-                      std::istream &args) { m.GotoState("off"); }},
-      }));
+      std::map<const std::string, Receiver>{}));
 
   m.Start();
 }
