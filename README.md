@@ -10,8 +10,8 @@ A Finite State Machine;
 - Communicates Asynchronously
 - Monitors Lifecycle with a Supervision Tree
 - Is uniquely identified by its name and address;
-  - local :<port> or 127.0.0.1:<port>
-  - remote <ip>:<port>
+  - local `:<port>` or `127.0.0.1:<port>`
+  - remote `<ip>:<port>`
 
 ### States
 
