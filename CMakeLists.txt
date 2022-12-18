@@ -17,6 +17,12 @@ add_subdirectory("src")
 
 add_subdirectory("samples")
 
+# Set the timestamps of extracted contents to the time of extraction
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 NEW)
+endif()
+
+# Fetch GoogleTest Library
 include(FetchContent)
 FetchContent_Declare(
   GoogleTest
