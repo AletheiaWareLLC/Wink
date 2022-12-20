@@ -17,10 +17,8 @@ int main(int argc, char **argv) {
   UDPSocket socket;
   Machine m(spawner, address, "time/Timer", socket);
 
-  std::istringstream iss(argv[3]);
   int seconds;
-  iss >> seconds;
-  std::time_t start = std::time(nullptr);
+  std::time_t start;
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -38,6 +36,7 @@ int main(int argc, char **argv) {
                        std::istream &args) { m.GotoState("idle"); }},
           {"start",
            [&](const Address &sender, std::istream &args) {
+             args >> seconds;
              start = std::time(nullptr);
              m.GotoState("timing");
            }},
@@ -51,7 +50,7 @@ int main(int argc, char **argv) {
       // State Name
       "timing",
       // Parent State
-      "",
+      "idle",
       // On Entry Action
       [&]() { m.SendSelf("update"); },
       // On Exit Action
@@ -72,5 +71,13 @@ int main(int argc, char **argv) {
              }
            }}}));
 
-  m.Start("timing");
+  if (argc == 4) {
+    // Start automatically
+    std::istringstream iss(argv[3]);
+    iss >> seconds;
+    start = std::time(nullptr);
+    m.Start("timing");
+  } else {
+    m.Start(); // Start in Idle
+  }
 }
