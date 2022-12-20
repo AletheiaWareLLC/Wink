@@ -24,9 +24,9 @@ services:
       - -c
       - |
         sleep 1
-        ./build/src/Wink start -a 10.0.0.4:42001 useless/Useless 10.0.0.2:64000
-        ./build/src/Wink start -a client:42001 useless/Useless server:64001
-        ./build/src/Wink start -a client:42001 useless/Useless network-server-1:64002
+        ./build/src/Wink start -a 10.0.0.4:42001 -f true useless/Useless 10.0.0.2:64000
+        ./build/src/Wink start -a client:42001 -f true useless/Useless server:64001
+        ./build/src/Wink start -a client:42001 -f true useless/Useless network-server-1:64002
     expose:
       - "42001:42001/udp"
     networks:
