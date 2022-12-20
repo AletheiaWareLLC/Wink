@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
       // State Name
       "timing",
       // Parent State
-      "",
+      "idle",
       // On Entry Action
       []() { info() << "StopWatch is TIMING\n"
                     << std::flush; },
