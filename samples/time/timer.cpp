@@ -53,23 +53,24 @@ int main(int argc, char **argv) {
       // Parent State
       "",
       // On Entry Action
-      [&]() {
-        const auto now = std::time(nullptr);
-        const auto elapsed = now - start;
-        info() << "Timer is TIMING: "<<elapsed<<'\n' << std::flush;
-        if (elapsed < seconds) {
-          sleep(1);
-          m.GotoState("timing"); // Loop
-        } else {
-          m.SendSpawner("timeup");
-          m.Exit();
-        }
-      },
+      [&]() { m.SendSelf("update"); },
       // On Exit Action
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
-      }));
+          {"update", [&](const Address &sender, std::istream &args) {
+             const auto now = std::time(nullptr);
+             const auto elapsed = now - start;
+             const auto remaining = seconds - elapsed;
+             info() << "Timer is TIMING: " << remaining << "s left\n"
+                    << std::flush;
+             if (remaining > 0) {
+               m.SendSelf("update"); // Loop
+             } else {
+               m.SendSpawner("timeup");
+               m.Exit();
+             }
+           }}}));
 
   m.Start("timing");
 }
