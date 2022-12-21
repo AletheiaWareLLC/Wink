@@ -5,9 +5,9 @@ Wink is framework for developing Fault Tolerant Systems with Asynchronous Concur
 ## Fault Tolerance
 
 > A system is fault-tolerant if it continues working even if something is wrong.
-
+>
 > Fault-tolerance cannot be achieved using a single computer – it may fail.
-
+>
 > -- *Joe Armstrong*
 
 ### Principles
@@ -45,6 +45,63 @@ A receiver is triggered upon receipt of a matching message.
 
 The optional empty receiver is triggered if no other receivers match.
 
+### Example
+
+```
+#include <iostream>
+#include <string>
+
+#include <Wink/address.h>
+#include <Wink/machine.h>
+#include <Wink/state.h>
+
+int main(int argc, char **argv) {
+  if (argc < 3) {
+    error() << "Incorrect parameters, expected <spawner> <address>\n"
+            << std::flush;
+    return -1;
+  }
+
+  Address spawner(argv[1]);
+  Address address(argv[2]);
+  UDPSocket socket;
+  Machine m(spawner, address, "switch/Switch", socket);
+
+  m.AddState(std::make_unique<State>(
+      // State Name
+      "off",
+      // Parent State
+      "",
+      // On Entry Action
+      []() { info() << "Switch is OFF\n"
+                    << std::flush; },
+      // On Exit Action
+      []() {},
+      // Receivers
+      std::map<const std::string, Receiver>{
+          {"on", [&](const Address &sender,
+                     std::istream &args) { m.GotoState("on"); }},
+          {"off", [&](const Address &sender,
+                      std::istream &args) { m.GotoState("off"); }},
+      }));
+
+  m.AddState(std::make_unique<State>(
+      // State Name
+      "on",
+      // Parent State
+      "off",
+      // On Entry Action
+      []() { info() << "Switch is ON\n"
+                    << std::flush; },
+      // On Exit Action
+      []() {},
+      // Receivers
+      std::map<const std::string, Receiver>{}));
+
+  m.Start();
+}
+```
+
 ## Lifecycle
 
 When a State Machine spawns another, the parent receives lifecycle messages from the child.
@@ -55,7 +112,7 @@ In the "success" case, the parent will receive;
 - pulsed - the child indicates it is still alive by sending a heartbeat message every 2 seconds.
 - exited - the child indicates it has terminated.
 
-In the "failure" case, the parent will receive;
+In the "error" case, the parent will receive;
 
 - started - same as above.
 - pulsed - same as above.
@@ -66,7 +123,7 @@ If a parent doesn't receive a heartbeat for 10 seconds it will assume the child 
 
 When a parent is notified that a child has errored, it can chose to do nothing, restart the child, or raise an error. In the last situation, the grandparent will be notified that the parent has errored.
 
-## Example
+### Example
 
 ```
 #include <iostream>
