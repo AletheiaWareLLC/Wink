@@ -106,7 +106,10 @@ int main(int argc, char **argv) {
         ss >> address;
       } else if (k == "-f") {
         std::stringstream ss(v);
-        ss >> follow;
+        std::string f;
+        ss >> f;
+        std::transform(f.begin(), f.end(), f.begin(),[](uchar c){ return std::tolower(c); });
+        follow = (f == "1" || f == "true");
       } else {
         error() << "Option " << k << ":" << v << " not supported\n"
                 << std::flush;
