@@ -32,35 +32,11 @@ int main(int argc, char **argv) {
                     << std::flush; },
       // Receivers
       std::map<const std::string, Receiver>{
-          {"started",
+          {"",
            [&](const Address &sender, std::istream &args) {
-             std::string child;
-             args >> child;
-             info() << "Delay: " << sender << ' ' << child << " has started\n"
-                    << std::flush;
-           }},
-          {"pulsed",
-           [&](const Address &sender, std::istream &args) {
-             std::string child;
-             args >> child;
-             info() << "Delay: " << sender << ' ' << child << " has pulsed\n"
-                    << std::flush;
-           }},
-          {"errored",
-           [&](const Address &sender, std::istream &args) {
-             std::string child;
-             args >> child;
              std::ostringstream os;
              os << args.rdbuf();
-             info() << "Delay: " << sender << ' ' << child
-                    << " has errored: " << os.str() << '\n'
-                    << std::flush;
-           }},
-          {"exited",
-           [&](const Address &sender, std::istream &args) {
-             std::string child;
-             args >> child;
-             info() << "Delay: " << sender << ' ' << child << " has exited\n"
+             info() << "Delay: " << sender << " : " << os.str() << '\n'
                     << std::flush;
            }},
           {"timeout",
