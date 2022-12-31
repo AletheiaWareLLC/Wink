@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
              if (remaining > 0) {
                m.SendSelf("update"); // Loop
              } else {
-               m.SendSpawner("timeup");
+               m.SendSpawner("timeout");
                m.Exit();
              }
            }}}));

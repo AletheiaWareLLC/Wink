@@ -33,7 +33,7 @@ public:
    * will start. If empty, the state machine will start in the
    * first state that was added.
    */
-  void Start(const std::string initial = "");
+  void Start(const std::string &initial = "");
   /**
    * Exit immediately ceases execution of the state machine and sends an
    * 'exited' message to the machine which spawned this machine.
@@ -44,7 +44,7 @@ public:
    * 'errored' message and the given error message to the machine which
    * spawned this machine.
    */
-  void Error(const std::string message);
+  void Error(const std::string &message);
   /**
    * AddState adds the given state to this state machine.
    */
@@ -52,27 +52,37 @@ public:
   /**
    * GotoState transitions the state machine to the given state.
    */
-  void GotoState(const std::string state);
+  void GotoState(const std::string &state);
   /**
    * Send transmits a message to the given address.
    */
-  void Send(const Address &address, const std::string message);
+  void Send(const Address &address, const std::string &message);
   /**
    * SendSelf transmits a message to this machine.
    */
-  void SendSelf(const std::string message);
+  void SendSelf(const std::string &message);
   /**
    * SendSpawner transmits a message to the machine which spawned this machine.
    */
-  void SendSpawner(const std::string message);
+  void SendSpawner(const std::string &message);
   /**
    * Spawn spawns a new state machine.
    */
-  void Spawn(const std::string machine);
+  void Spawn(const std::string &machine);
+  /**
+   * Spawn spawns a new state machine with the given arguments.
+   */
+  void Spawn(const std::string &machine, const std::vector<std::string> &args);
   /**
    * Spawn spawns a new state machine at the given address.
    */
-  void Spawn(const std::string machine, const Address &address);
+  void Spawn(const std::string &machine, const Address &address);
+  /**
+   * Spawn spawns a new state machine at the given address with the given
+   * arguments.
+   */
+  void Spawn(const std::string &machine, const Address &address,
+             const std::vector<std::string> &args);
 
   std::function<void()> onExit = []() { _exit(0); };
 
@@ -81,7 +91,7 @@ private:
   void checkHealthOfSpawned(const std::time_t now);
   void receiveMessage(const std::time_t now);
   void handleMessage(const std::time_t now);
-  void registerMachine(const std::string machine, const int pid);
+  void registerMachine(const std::string &machine, const int pid);
   void unregisterMachine();
 
   Address &spawner;
