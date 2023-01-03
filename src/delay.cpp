@@ -5,7 +5,7 @@ void CallAfter(std::function<void()> f, std::time_t d) {
   pid_t pid;
   switch (pid = fork()) {
   case -1:
-    error() << "Failed to fork process: " << strerror(errno) << '\n'
+    error() << "Failed to fork process: " << std::strerror(errno) << '\n'
             << std::flush;
   case 0: {
     // Child sleeps for the delay, then calls function

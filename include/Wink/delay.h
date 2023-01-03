@@ -2,6 +2,7 @@
 #define DELAY_H
 
 #include <ctime>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <unistd.h>

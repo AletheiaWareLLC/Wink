@@ -15,7 +15,7 @@ void Machine::Start(const std::string initial) {
 
   // Set Receive Timeout
   if (const auto result = socket.SetReceiveTimeout(REPLY_TIMEOUT); result < 0) {
-    error() << "Failed to set receive timeout: " << strerror(errno) << '\n'
+    error() << "Failed to set receive timeout: " << std::strerror(errno) << '\n'
             << std::flush;
     return;
   }
@@ -114,7 +114,7 @@ void Machine::Send(const Address &address, const std::string message) {
   if (const auto result =
           socket.Send(address, message.c_str(), message.length() + 1);
       result < 0) {
-    error() << uid << ": Failed to send packet: " << strerror(errno) << '\n'
+    error() << uid << ": Failed to send packet: " << std::strerror(errno) << '\n'
             << std::flush;
   }
 }
@@ -190,7 +190,7 @@ void Machine::receiveMessage(const std::time_t now) {
     if (errno == EAGAIN) {
       return;
     }
-    error() << uid << ": Failed to receive packet: " << strerror(errno) << '\n'
+    error() << uid << ": Failed to receive packet: " << std::strerror(errno) << '\n'
             << std::flush;
 
     return;
