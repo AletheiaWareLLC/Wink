@@ -13,7 +13,7 @@ TEST(DelayTest, CallAfter) {
 
   auto f = [&]() {
     close(fd[0]); // Close reading end of pipe
-    ASSERT_EQ(0, write(fd[1], TEST, strlen(TEST) + 1)); // Write message
+    ASSERT_EQ(5, write(fd[1], TEST, strlen(TEST) + 1)); // Write message
     close(fd[1]); // Close writing end of pipe
   };
 
@@ -24,7 +24,7 @@ TEST(DelayTest, CallAfter) {
   close(fd[1]); // Close writing end of pipe
 
   char buffer[100];
-  ASSERT_EQ(0, read(fd[0], buffer, 100)); // Read message
+  ASSERT_EQ(5, read(fd[0], buffer, 100)); // Read message
 
   close(fd[0]); // Close reading end of pipe
 
