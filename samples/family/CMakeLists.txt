@@ -1,12 +1,14 @@
 set(LIBRARY_NAME libWink)
 
+set(INCLUDE_DIR "../../include")
+
 set(PARENT_NAME Parent)
 
 set(SOURCE
     "parent.cpp"
 )
 
-include_directories("../../include")
+include_directories(${INCLUDE_DIR})
 
 add_executable(${PARENT_NAME} ${SOURCE})
 
@@ -18,7 +20,7 @@ set(SOURCE
     "child.cpp"
 )
 
-include_directories("../../include")
+include_directories(${INCLUDE_DIR})
 
 add_executable(${CHILD_NAME} ${SOURCE})
 
