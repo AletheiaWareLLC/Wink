@@ -52,6 +52,7 @@ The optional empty receiver is triggered if no other receivers match.
 #include <string>
 
 #include <Wink/address.h>
+#include <Wink/log.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
@@ -130,6 +131,7 @@ When a parent is notified that a child has errored, it can chose to do nothing, 
 #include <string>
 
 #include <Wink/address.h>
+#include <Wink/log.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
@@ -204,6 +206,7 @@ int main(int argc, char **argv) {
 #include <string>
 
 #include <Wink/address.h>
+#include <Wink/log.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
@@ -267,7 +270,7 @@ Parent: 127.0.0.1:64701 family/Child has exited                                 
 Parent: OnExit                                                                  # Parent Exits `main` State
 ```
 
-## Repository
+## Repository Layout
 
  - include: header files
  - samples: code samples
