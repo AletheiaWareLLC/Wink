@@ -1,6 +1,6 @@
 #include <Wink/delay.h>
 
-void CallAfter(std::function<void()> f, std::time_t d) {
+void After(std::time_t d, std::function<void()> f) {
   // Fork child process
   pid_t pid;
   switch (pid = fork()) {

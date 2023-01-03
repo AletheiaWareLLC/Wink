@@ -5,7 +5,7 @@
 #include <Wink/delay.h>
 #include <Wink/log.h>
 
-TEST(DelayTest, CallAfter) {
+TEST(DelayTest, After) {
   const auto TEST = "test";
 
   int fd[2]; // [0] for read, [1] for write
@@ -17,7 +17,7 @@ TEST(DelayTest, CallAfter) {
     close(fd[1]); // Close writing end of pipe
   };
 
-  CallAfter(f, 1);
+  After(1, f);
 
   sleep(2);
 

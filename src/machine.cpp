@@ -114,7 +114,8 @@ void Machine::Send(const Address &address, const std::string message) {
   if (const auto result =
           socket.Send(address, message.c_str(), message.length() + 1);
       result < 0) {
-    error() << uid << ": Failed to send packet: " << std::strerror(errno) << '\n'
+    error() << uid << ": Failed to send packet: " << std::strerror(errno)
+            << '\n'
             << std::flush;
   }
 }
@@ -190,7 +191,8 @@ void Machine::receiveMessage(const std::time_t now) {
     if (errno == EAGAIN) {
       return;
     }
-    error() << uid << ": Failed to receive packet: " << std::strerror(errno) << '\n'
+    error() << uid << ": Failed to receive packet: " << std::strerror(errno)
+            << '\n'
             << std::flush;
 
     return;

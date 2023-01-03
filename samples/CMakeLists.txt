@@ -1,5 +1,7 @@
 # add_subdirectory("blinky")
 
+add_subdirectory("delay")
+
 add_subdirectory("echo")
 
 add_subdirectory("family")

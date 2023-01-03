@@ -25,7 +25,8 @@ int logToFile(const std::string &directory, const std::string &name) {
 
   if (const auto d = directory.c_str(); stat(d, &st) == -1) {
     if (const auto result = mkdir(d, 0777); result < 0) {
-      error() << "Failed to make log directory: " << std::strerror(errno) << '\n'
+      error() << "Failed to make log directory: " << std::strerror(errno)
+              << '\n'
               << std::flush;
       return -1;
     }
@@ -43,8 +44,8 @@ int logToFile(const std::string &directory, const std::string &name) {
 
   int fd = open(filepath.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
   if (fd < 0) {
-    error() << "Failed to open file: " << filepath << ": " << std::strerror(errno)
-            << '\n'
+    error() << "Failed to open file: " << filepath << ": "
+            << std::strerror(errno) << '\n'
             << std::flush;
     return -1;
   }
