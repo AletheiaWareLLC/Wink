@@ -7,6 +7,10 @@
 
 #include <Wink/log.h>
 
+/**
+ * Calls the given lambda in a new process after the given time delay has
+ * elapsed.
+ */
 void CallAfter(std::function<void()> f, std::time_t d);
 
 #endif
