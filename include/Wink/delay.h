@@ -1,6 +1,7 @@
 #ifndef DELAY_H
 #define DELAY_H
 
+#include <ctime>
 #include <functional>
 #include <iostream>
 #include <unistd.h>
