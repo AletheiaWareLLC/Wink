@@ -4,7 +4,6 @@
 set(LIBRARY_SOURCES
   "address.cpp"
   "client.cpp"
-  "delay.cpp"
   "log.cpp"
   "machine.cpp"
   "udp.cpp"

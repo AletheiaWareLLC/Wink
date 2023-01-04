@@ -23,7 +23,7 @@ void Machine::Start(const std::string initial) {
   info() << uid << " started\n" << std::flush;
 
   // Notify parent of start
-  SendSpawner("started " + name);
+  Send(spawner, "started " + name);
 
   // Register with server
   registerMachine(name, getpid());
@@ -39,12 +39,13 @@ void Machine::Start(const std::string initial) {
   std::time_t last = std::time(nullptr);
   while (running) {
     const std::time_t now = std::time(nullptr);
+    checkHealthOfSpawned(now); // Check every loop
     if (now - last > PULSE_INTERVAL) {
       sendPulseToSpawner(); // Send every PULSE_INTERVAL
       last = now;
     }
-    checkHealthOfSpawned(now); // Check every loop
-    receiveMessage(now);       // Waits up to REPLY_TIMEOUT for message
+    sendScheduled(now);  // Send any scheduled messages
+    receiveMessage(now); // Waits up to REPLY_TIMEOUT for message
   }
 }
 
@@ -61,7 +62,7 @@ void Machine::Exit() {
   oss << name;
 
   // Notify parent of exit
-  SendSpawner(oss.str());
+  Send(spawner, oss.str());
 
   // Unregister with server
   unregisterMachine();
@@ -83,7 +84,7 @@ void Machine::Error(const std::string message) {
   oss << message;
 
   // Notify parent of error
-  SendSpawner(oss.str());
+  Send(spawner, oss.str());
 
   Exit();
   return;
@@ -120,9 +121,17 @@ void Machine::Send(const Address &address, const std::string message) {
   }
 }
 
-void Machine::SendSelf(const std::string message) { Send(address, message); }
+void Machine::SendAt(const Address &address, const std::string message,
+                     const std::time_t time) {
+  queue.push_back(ScheduledMessage{address, message, time});
+}
 
-void Machine::SendSpawner(const std::string message) { Send(spawner, message); }
+void Machine::SendAfter(const Address &address, const std::string message,
+                        const std::time_t delay) {
+  std::time_t time = std::time(nullptr);
+  time += delay;
+  SendAt(address, message, time);
+}
 
 void Machine::Spawn(const std::string machine) {
   const Address destination(address.ip, 0);
@@ -140,8 +149,6 @@ void Machine::Spawn(const std::string machine, const Address &address) {
   const auto s = oss.str();
   Send(server, s);
 }
-
-void Machine::sendPulseToSpawner() { SendSpawner("pulsed " + name); }
 
 void Machine::checkHealthOfSpawned(const std::time_t now) {
   std::vector<std::string> dead;
@@ -181,6 +188,20 @@ void Machine::checkHealthOfSpawned(const std::time_t now) {
         buffer[s.size()] = 0;
         handleMessage(now);
       }
+    }
+  }
+}
+
+void Machine::sendPulseToSpawner() { Send(spawner, "pulsed " + name); }
+
+void Machine::sendScheduled(const std::time_t now) {
+  std::vector<ScheduledMessage> q;
+  q.swap(queue);
+  for (const auto &e : q) {
+    if (e.time < now) {
+      Send(e.address, e.message);
+    } else {
+      queue.push_back(e);
     }
   }
 }

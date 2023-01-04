@@ -2,7 +2,6 @@
 #include <string>
 
 #include <Wink/address.h>
-#include <Wink/delay.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
@@ -25,8 +24,8 @@ int main(int argc, char **argv) {
       "",
       // On Entry Action
       [&]() {
-        // Wait 5s then exit
-        After(5, [&]() { m.SendSelf("exit"); });
+        // Schedule message to be sent to self after 10s
+        m.SendAfter(address, "exit", 10);
       },
       // On Exit Action
       []() {},

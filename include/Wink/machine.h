@@ -58,13 +58,15 @@ public:
    */
   void Send(const Address &address, const std::string message);
   /**
-   * SendSelf transmits a message to this machine.
+   * SendAt sends the given address the message at the given time.
    */
-  void SendSelf(const std::string message);
+  void SendAt(const Address &address, const std::string message,
+              const std::time_t time);
   /**
-   * SendSpawner transmits a message to the machine which spawned this machine.
+   * SendAfter sends the given address the message after the given delay.
    */
-  void SendSpawner(const std::string message);
+  void SendAfter(const Address &address, const std::string message,
+                 const std::time_t delay);
   /**
    * Spawn spawns a new state machine.
    */
@@ -77,8 +79,9 @@ public:
   std::function<void()> onExit = []() { _exit(0); };
 
 private:
-  void sendPulseToSpawner();
   void checkHealthOfSpawned(const std::time_t now);
+  void sendPulseToSpawner();
+  void sendScheduled(const std::time_t now);
   void receiveMessage(const std::time_t now);
   void handleMessage(const std::time_t now);
   void registerMachine(const std::string machine, const int pid);
@@ -94,7 +97,14 @@ private:
   char buffer[MAX_PAYLOAD];
   std::map<const std::string, const std::unique_ptr<State>> states;
   std::string current;
-  std::map<const std::string, std::pair<const std::string, time_t>> spawned;
+  struct ScheduledMessage {
+    const Address &address;
+    const std::string message;
+    const std::time_t time;
+  };
+  std::vector<ScheduledMessage> queue;
+  std::map<const std::string, std::pair<const std::string, std::time_t>>
+      spawned;
 };
 
 #endif

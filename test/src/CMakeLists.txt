@@ -9,7 +9,6 @@ set(TARGET_NAME WinkTests)
 set(SOURCE
   "address.cpp"
   "client.cpp"
-  "delay.cpp"
   "machine.cpp"
   "server.cpp"
   "socket.cpp"
