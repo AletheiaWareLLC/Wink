@@ -441,13 +441,13 @@ TEST(MachineTest, SendAt) {
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
-        {"exit",
+          {"exit",
            [&](const Address &sender, std::istream &args) { m.Exit(); }},
       }));
   std::thread worker([&]() { m.Start(); });
 
-  std::time_t time = std::time(nullptr);
-  time += 1;
+  auto time = std::chrono::system_clock::now();
+  time += std::chrono::seconds(1);
   m.SendAt(address, "exit", time);
 
   worker.join();
@@ -472,12 +472,12 @@ TEST(MachineTest, SendAfter) {
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
-        {"exit",
+          {"exit",
            [&](const Address &sender, std::istream &args) { m.Exit(); }},
       }));
   std::thread worker([&]() { m.Start(); });
 
-  m.SendAfter(address, "exit", 1);
+  m.SendAfter(address, "exit", std::chrono::seconds(1));
 
   worker.join();
 }

@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <string>
 
@@ -15,7 +16,7 @@ int main(int argc, char **argv) {
   Address spawner(argv[1]);
   Address address(argv[2]);
   UDPSocket socket;
-  Machine m(spawner, address, "delay/Delay", socket);
+  Machine m(spawner, address, "time/At", socket);
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -24,8 +25,10 @@ int main(int argc, char **argv) {
       "",
       // On Entry Action
       [&]() {
-        // Schedule message to be sent to self after 10s
-        m.SendAfter(address, "exit", 10);
+        // Schedule message to be sent to self at the start of the next minute
+        const auto now = std::chrono::system_clock::now();
+        const auto time = std::chrono::ceil<std::chrono::minutes>(now);
+        m.SendAt(address, "exit", time);
       },
       // On Exit Action
       []() {},

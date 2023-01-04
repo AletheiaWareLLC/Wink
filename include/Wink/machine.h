@@ -1,7 +1,7 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
-#include <ctime>
+#include <chrono>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -61,12 +61,12 @@ public:
    * SendAt sends the given address the message at the given time.
    */
   void SendAt(const Address &address, const std::string message,
-              const std::time_t time);
+              const std::chrono::time_point<std::chrono::system_clock> time);
   /**
    * SendAfter sends the given address the message after the given delay.
    */
   void SendAfter(const Address &address, const std::string message,
-                 const std::time_t delay);
+                 const std::chrono::seconds delay);
   /**
    * Spawn spawns a new state machine.
    */
@@ -79,11 +79,15 @@ public:
   std::function<void()> onExit = []() { _exit(0); };
 
 private:
-  void checkHealthOfSpawned(const std::time_t now);
+  void checkHealthOfSpawned(
+      const std::chrono::time_point<std::chrono::system_clock> now);
   void sendPulseToSpawner();
-  void sendScheduled(const std::time_t now);
-  void receiveMessage(const std::time_t now);
-  void handleMessage(const std::time_t now);
+  void
+  sendScheduled(const std::chrono::time_point<std::chrono::system_clock> now);
+  void
+  receiveMessage(const std::chrono::time_point<std::chrono::system_clock> now);
+  void
+  handleMessage(const std::chrono::time_point<std::chrono::system_clock> now);
   void registerMachine(const std::string machine, const int pid);
   void unregisterMachine();
 
@@ -100,10 +104,12 @@ private:
   struct ScheduledMessage {
     const Address &address;
     const std::string message;
-    const std::time_t time;
+    const std::chrono::time_point<std::chrono::system_clock> time;
   };
   std::vector<ScheduledMessage> queue;
-  std::map<const std::string, std::pair<const std::string, std::time_t>>
+  std::map<const std::string,
+           std::pair<const std::string,
+                     std::chrono::time_point<std::chrono::system_clock>>>
       spawned;
 };
 

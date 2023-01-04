@@ -32,8 +32,9 @@ int logToFile(const std::string &directory, const std::string &name) {
     }
   }
 
-  std::time_t t = std::time(nullptr);
-  std::tm tm = *std::gmtime(&t);
+  const auto now = std::chrono::system_clock::now();
+  const auto tt = std::chrono::system_clock::to_time_t(now);
+  const auto tm = *std::gmtime(&tt);
 
   std::ostringstream filename;
   filename << std::put_time(&tm, "%Y%m%d%H%M%S");

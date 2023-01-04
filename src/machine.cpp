@@ -36,11 +36,11 @@ void Machine::Start(const std::string initial) {
   GotoState(state);
 
   // Loop receiving messages
-  std::time_t last = std::time(nullptr);
+  auto last = std::chrono::system_clock::now();
   while (running) {
-    const std::time_t now = std::time(nullptr);
+    const auto now = std::chrono::system_clock::now();
     checkHealthOfSpawned(now); // Check every loop
-    if (now - last > PULSE_INTERVAL) {
+    if (now - last > std::chrono::seconds(PULSE_INTERVAL)) {
       sendPulseToSpawner(); // Send every PULSE_INTERVAL
       last = now;
     }
@@ -121,14 +121,15 @@ void Machine::Send(const Address &address, const std::string message) {
   }
 }
 
-void Machine::SendAt(const Address &address, const std::string message,
-                     const std::time_t time) {
+void Machine::SendAt(
+    const Address &address, const std::string message,
+    const std::chrono::time_point<std::chrono::system_clock> time) {
   queue.push_back(ScheduledMessage{address, message, time});
 }
 
 void Machine::SendAfter(const Address &address, const std::string message,
-                        const std::time_t delay) {
-  std::time_t time = std::time(nullptr);
+                        const std::chrono::seconds delay) {
+  auto time = std::chrono::system_clock::now();
   time += delay;
   SendAt(address, message, time);
 }
@@ -150,10 +151,12 @@ void Machine::Spawn(const std::string machine, const Address &address) {
   Send(server, s);
 }
 
-void Machine::checkHealthOfSpawned(const std::time_t now) {
+void Machine::checkHealthOfSpawned(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
   std::vector<std::string> dead;
   for (const auto &[k, v] : spawned) {
-    if (const auto d = now - v.second; d > HEARTBEAT_TIMEOUT) {
+    if (const auto d = now - v.second;
+        d > std::chrono::seconds(HEARTBEAT_TIMEOUT)) {
       dead.push_back(k);
     }
   }
@@ -194,7 +197,8 @@ void Machine::checkHealthOfSpawned(const std::time_t now) {
 
 void Machine::sendPulseToSpawner() { Send(spawner, "pulsed " + name); }
 
-void Machine::sendScheduled(const std::time_t now) {
+void Machine::sendScheduled(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
   std::vector<ScheduledMessage> q;
   q.swap(queue);
   for (const auto &e : q) {
@@ -206,7 +210,8 @@ void Machine::sendScheduled(const std::time_t now) {
   }
 }
 
-void Machine::receiveMessage(const std::time_t now) {
+void Machine::receiveMessage(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
   if (const auto result = socket.Receive(sender, buffer, MAX_PAYLOAD);
       result < 0) {
     if (errno == EAGAIN) {
@@ -221,7 +226,8 @@ void Machine::receiveMessage(const std::time_t now) {
   handleMessage(now);
 }
 
-void Machine::handleMessage(const std::time_t now) {
+void Machine::handleMessage(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
   info() << uid << " < " << sender << ' ' << buffer << '\n' << std::flush;
   std::istringstream iss(buffer);
   std::string m;

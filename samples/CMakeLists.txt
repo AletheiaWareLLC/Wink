@@ -1,7 +1,5 @@
 # add_subdirectory("blinky")
 
-add_subdirectory("delay")
-
 add_subdirectory("echo")
 
 add_subdirectory("family")
@@ -16,6 +14,6 @@ add_subdirectory("hierarchy")
 
 add_subdirectory("switch")
 
-# add_subdirectory("timer")
+add_subdirectory("time")
 
 add_subdirectory("useless")
