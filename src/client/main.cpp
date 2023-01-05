@@ -108,7 +108,8 @@ int main(int argc, char **argv) {
         std::stringstream ss(v);
         std::string f;
         ss >> f;
-        std::transform(f.begin(), f.end(), f.begin(),[](uchar c){ return std::tolower(c); });
+        std::transform(f.begin(), f.end(), f.begin(),
+                       [](uchar c) { return std::tolower(c); });
         follow = (f == "1" || f == "true");
       } else {
         error() << "Option " << k << ":" << v << " not supported\n"
