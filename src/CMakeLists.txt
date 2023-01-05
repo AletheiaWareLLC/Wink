@@ -1,3 +1,5 @@
+set(INCLUDE_DIR "../include")
+
 ################################################################
 # Libraries
 
@@ -9,7 +11,7 @@ set(LIBRARY_SOURCES
   "udp.cpp"
 )
 
-include_directories("../include")
+include_directories(${INCLUDE_DIR})
 
 set(LIBRARY_NAME libWink)
 
@@ -19,7 +21,7 @@ set(SERVER_LIBRARY_SOURCES
   "server/server.cpp"
 )
 
-include_directories("../include")
+include_directories(${INCLUDE_DIR})
 
 set(SERVER_LIBRARY_NAME libWinkServer)
 

@@ -1,12 +1,14 @@
 set(LIBRARY_NAME libWink)
 
+set(INCLUDE_DIR "../../include")
+
 set(TARGET_NAME Echo)
 
 set(SOURCE
     "echo.cpp"
 )
 
-include_directories("../../include")
+include_directories(${INCLUDE_DIR})
 
 add_executable(${TARGET_NAME} ${SOURCE})
 

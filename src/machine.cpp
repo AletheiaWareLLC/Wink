@@ -1,6 +1,6 @@
 #include <Wink/machine.h>
 
-void Machine::Start(const std::string initial) {
+void Machine::Start(const std::string &initial) {
   // Bind to port
   if (const auto result = socket.Bind(address); result < 0) {
     error() << "Failed to bind to port " << address.port << '\n' << std::flush;
@@ -15,7 +15,7 @@ void Machine::Start(const std::string initial) {
 
   // Set Receive Timeout
   if (const auto result = socket.SetReceiveTimeout(REPLY_TIMEOUT); result < 0) {
-    error() << "Failed to set receive timeout: " << strerror(errno) << '\n'
+    error() << "Failed to set receive timeout: " << std::strerror(errno) << '\n'
             << std::flush;
     return;
   }
@@ -23,7 +23,7 @@ void Machine::Start(const std::string initial) {
   info() << uid << " started\n" << std::flush;
 
   // Notify parent of start
-  SendSpawner("started " + name);
+  Send(spawner, "started " + name);
 
   // Register with server
   registerMachine(name, getpid());
@@ -36,15 +36,16 @@ void Machine::Start(const std::string initial) {
   GotoState(state);
 
   // Loop receiving messages
-  std::time_t last = std::time(nullptr);
+  auto last = std::chrono::system_clock::now();
   while (running) {
-    const std::time_t now = std::time(nullptr);
-    if (now - last > PULSE_INTERVAL) {
+    const auto now = std::chrono::system_clock::now();
+    checkHealthOfSpawned(now); // Check every loop
+    if (now - last > std::chrono::seconds(PULSE_INTERVAL)) {
       sendPulseToSpawner(); // Send every PULSE_INTERVAL
       last = now;
     }
-    checkHealthOfSpawned(now); // Check every loop
-    receiveMessage(now);       // Waits up to REPLY_TIMEOUT for message
+    sendScheduled(now);  // Send any scheduled messages
+    receiveMessage(now); // Waits up to REPLY_TIMEOUT for message
   }
 }
 
@@ -61,7 +62,7 @@ void Machine::Exit() {
   oss << name;
 
   // Notify parent of exit
-  SendSpawner(oss.str());
+  Send(spawner, oss.str());
 
   // Unregister with server
   unregisterMachine();
@@ -73,7 +74,7 @@ void Machine::Exit() {
   return;
 }
 
-void Machine::Error(const std::string message) {
+void Machine::Error(const std::string &message) {
   info() << uid << " errored: " << message << '\n' << std::flush;
 
   std::ostringstream oss;
@@ -83,7 +84,7 @@ void Machine::Error(const std::string message) {
   oss << message;
 
   // Notify parent of error
-  SendSpawner(oss.str());
+  Send(spawner, oss.str());
 
   Exit();
   return;
@@ -97,7 +98,7 @@ void Machine::AddState(std::unique_ptr<State> &&state) {
   states.emplace(n, std::move(state));
 }
 
-void Machine::GotoState(const std::string state) {
+void Machine::GotoState(const std::string &state) {
   // Exit current state
   if (const auto it = states.find(current); it != states.end()) {
     it->second->onExit();
@@ -109,26 +110,48 @@ void Machine::GotoState(const std::string state) {
   }
 }
 
-void Machine::Send(const Address &address, const std::string message) {
+void Machine::Send(const Address &address, const std::string &message) {
   info() << uid << " > " << address << ' ' << message << '\n' << std::flush;
   if (const auto result =
           socket.Send(address, message.c_str(), message.length() + 1);
       result < 0) {
-    error() << uid << ": Failed to send packet: " << strerror(errno) << '\n'
+    error() << uid << ": Failed to send packet: " << std::strerror(errno)
+            << '\n'
             << std::flush;
   }
 }
 
-void Machine::SendSelf(const std::string message) { Send(address, message); }
-
-void Machine::SendSpawner(const std::string message) { Send(spawner, message); }
-
-void Machine::Spawn(const std::string machine) {
-  const Address destination(address.ip, 0);
-  Spawn(machine, destination);
+void Machine::SendAt(
+    const Address &address, const std::string &message,
+    const std::chrono::time_point<std::chrono::system_clock> time) {
+  queue.push_back(ScheduledMessage{address, message, time});
 }
 
-void Machine::Spawn(const std::string machine, const Address &address) {
+void Machine::SendAfter(const Address &address, const std::string &message,
+                        const std::chrono::seconds delay) {
+  auto time = std::chrono::system_clock::now();
+  time += delay;
+  SendAt(address, message, time);
+}
+
+void Machine::Spawn(const std::string &machine) {
+  std::vector<std::string> args;
+  Spawn(machine, args);
+}
+
+void Machine::Spawn(const std::string &machine,
+                    const std::vector<std::string> &args) {
+  const Address destination(address.ip, 0);
+  Spawn(machine, destination, args);
+}
+
+void Machine::Spawn(const std::string &machine, const Address &address) {
+  std::vector<std::string> args;
+  Spawn(machine, address, args);
+}
+
+void Machine::Spawn(const std::string &machine, const Address &address,
+                    const std::vector<std::string> &args) {
   // Send Request
   Address server(address.ip, SERVER_PORT);
   std::ostringstream oss;
@@ -136,16 +159,20 @@ void Machine::Spawn(const std::string machine, const Address &address) {
   oss << machine;
   oss << " :";
   oss << address.port;
+  for (const auto &a : args) {
+    oss << ' ';
+    oss << a;
+  }
   const auto s = oss.str();
   Send(server, s);
 }
 
-void Machine::sendPulseToSpawner() { SendSpawner("pulsed " + name); }
-
-void Machine::checkHealthOfSpawned(const std::time_t now) {
+void Machine::checkHealthOfSpawned(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
   std::vector<std::string> dead;
   for (const auto &[k, v] : spawned) {
-    if (const auto d = now - v.second; d > HEARTBEAT_TIMEOUT) {
+    if (const auto d = now - v.second;
+        d > std::chrono::seconds(HEARTBEAT_TIMEOUT)) {
       dead.push_back(k);
     }
   }
@@ -184,13 +211,30 @@ void Machine::checkHealthOfSpawned(const std::time_t now) {
   }
 }
 
-void Machine::receiveMessage(const std::time_t now) {
+void Machine::sendPulseToSpawner() { Send(spawner, "pulsed " + name); }
+
+void Machine::sendScheduled(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
+  std::vector<ScheduledMessage> q;
+  q.swap(queue);
+  for (const auto &e : q) {
+    if (e.time < now) {
+      Send(e.address, e.message);
+    } else {
+      queue.push_back(e);
+    }
+  }
+}
+
+void Machine::receiveMessage(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
   if (const auto result = socket.Receive(sender, buffer, MAX_PAYLOAD);
       result < 0) {
     if (errno == EAGAIN) {
       return;
     }
-    error() << uid << ": Failed to receive packet: " << strerror(errno) << '\n'
+    error() << uid << ": Failed to receive packet: " << std::strerror(errno)
+            << '\n'
             << std::flush;
 
     return;
@@ -198,7 +242,8 @@ void Machine::receiveMessage(const std::time_t now) {
   handleMessage(now);
 }
 
-void Machine::handleMessage(const std::time_t now) {
+void Machine::handleMessage(
+    const std::chrono::time_point<std::chrono::system_clock> now) {
   info() << uid << " < " << sender << ' ' << buffer << '\n' << std::flush;
   std::istringstream iss(buffer);
   std::string m;
@@ -246,7 +291,7 @@ void Machine::handleMessage(const std::time_t now) {
   Error("unhandled message: " + m);
 }
 
-void Machine::registerMachine(const std::string machine, const int pid) {
+void Machine::registerMachine(const std::string &machine, const int pid) {
   std::ostringstream oss;
   oss << "register ";
   oss << machine;
