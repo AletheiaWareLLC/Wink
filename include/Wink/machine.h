@@ -70,9 +70,19 @@ public:
    */
   void Spawn(const std::string &machine);
   /**
+   * Spawn spawns a new state machine with the given arguments.
+   */
+  void Spawn(const std::string &machine, const std::vector<std::string> &args);
+  /**
    * Spawn spawns a new state machine at the given address.
    */
   void Spawn(const std::string &machine, const Address &address);
+  /**
+   * Spawn spawns a new state machine at the given address with the given
+   * arguments.
+   */
+  void Spawn(const std::string &machine, const Address &address,
+             const std::vector<std::string> &args);
 
   std::function<void()> onExit = []() { _exit(0); };
 
