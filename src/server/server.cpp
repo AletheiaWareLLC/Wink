@@ -13,7 +13,7 @@ int Server::Serve(const std::string &directory) {
   // Bind to address
   if (const auto result = socket.Bind(address); result < 0) {
     error() << "Failed to bind to address: " << address << " : "
-            << strerror(errno) << '\n'
+            << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -23,7 +23,7 @@ int Server::Serve(const std::string &directory) {
 
   // Set Receive Timeout
   if (const auto result = socket.SetReceiveTimeout(NO_TIMEOUT); result < 0) {
-    error() << "Failed to set receive timeout: " << strerror(errno) << '\n'
+    error() << "Failed to set receive timeout: " << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -33,7 +33,7 @@ int Server::Serve(const std::string &directory) {
   while (1) {
     if (const auto result = socket.Receive(sender, buffer, MAX_PAYLOAD);
         result < 0) {
-      error() << "Failed to receive packet: " << strerror(errno) << '\n'
+      error() << "Failed to receive packet: " << std::strerror(errno) << '\n'
               << std::flush;
       return -1;
     }
@@ -136,7 +136,7 @@ int Server::Start(const std::string &machine,
   pid_t pid;
   switch (pid = fork()) {
   case -1:
-    error() << "Failed to fork process: " << strerror(errno) << '\n'
+    error() << "Failed to fork process: " << std::strerror(errno) << '\n'
             << std::flush;
     return -1;
   case 0: {
@@ -173,7 +173,7 @@ int Server::Start(const std::string &machine,
 
     if (result < 0) {
       error() << "Failed to execute binary: " << parameters.at(0) << ": "
-              << strerror(errno) << '\n'
+              << std::strerror(errno) << '\n'
               << std::flush;
       return result;
     }

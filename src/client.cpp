@@ -6,7 +6,7 @@ int StartMachine(Socket &socket, Address &address, const std::string &binary,
   // Bind to address
   if (const auto result = socket.Bind(address); result < 0) {
     error() << "Failed to bind to address: " << address << " : "
-            << strerror(errno) << '\n'
+            << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -17,7 +17,7 @@ int StartMachine(Socket &socket, Address &address, const std::string &binary,
   // Set Receive Timeout
   if (const auto result = socket.SetReceiveTimeout(HEARTBEAT_TIMEOUT);
       result < 0) {
-    error() << "Failed to set receive timeout: " << strerror(errno) << '\n'
+    error() << "Failed to set receive timeout: " << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -42,7 +42,7 @@ int StartMachine(Socket &socket, Address &address, const std::string &binary,
   char buffer[MAX_PAYLOAD];
   if (const auto result = socket.Receive(destination, buffer, MAX_PAYLOAD);
       result < 0) {
-    error() << "Failed to receive packet: " << strerror(errno) << '\n'
+    error() << "Failed to receive packet: " << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -75,7 +75,7 @@ int StartMachine(Socket &socket, Address &address, const std::string &binary,
                << std::flush;
         return -1;
       }
-      error() << "Failed to receive packet: " << strerror(errno) << '\n'
+      error() << "Failed to receive packet: " << std::strerror(errno) << '\n'
               << std::flush;
       return result;
     }
@@ -104,7 +104,7 @@ int SendMessage(Socket &socket, const Address &address,
   if (const auto result =
           socket.Send(address, message.c_str(), message.length() + 1);
       result < 0) {
-    error() << "Failed to send packet: " << strerror(errno) << '\n'
+    error() << "Failed to send packet: " << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -117,7 +117,7 @@ int ListMachines(Socket &socket, const Address &server) {
   // Bind to address
   if (const auto result = socket.Bind(address); result < 0) {
     error() << "Failed to bind to address: " << address << " : "
-            << strerror(errno) << '\n'
+            << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -128,7 +128,7 @@ int ListMachines(Socket &socket, const Address &server) {
   // Set Receive Timeout
   if (const auto result = socket.SetReceiveTimeout(HEARTBEAT_TIMEOUT);
       result < 0) {
-    error() << "Failed to set receive timeout: " << strerror(errno) << '\n'
+    error() << "Failed to set receive timeout: " << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }
@@ -143,7 +143,7 @@ int ListMachines(Socket &socket, const Address &server) {
   char buffer[MAX_PAYLOAD];
   if (const auto result = socket.Receive(from, buffer, MAX_PAYLOAD);
       result < 0) {
-    error() << "Failed to receive packet: " << strerror(errno) << '\n'
+    error() << "Failed to receive packet: " << std::strerror(errno) << '\n'
             << std::flush;
     return result;
   }

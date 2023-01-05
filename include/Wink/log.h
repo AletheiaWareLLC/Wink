@@ -1,6 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include <chrono>
 #include <iostream>
 
 std::ostream &error();

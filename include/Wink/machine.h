@@ -1,7 +1,7 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
-#include <ctime>
+#include <chrono>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -58,13 +58,15 @@ public:
    */
   void Send(const Address &address, const std::string &message);
   /**
-   * SendSelf transmits a message to this machine.
+   * SendAt sends the given address the message at the given time.
    */
-  void SendSelf(const std::string &message);
+  void SendAt(const Address &address, const std::string &message,
+              const std::chrono::time_point<std::chrono::system_clock> time);
   /**
-   * SendSpawner transmits a message to the machine which spawned this machine.
+   * SendAfter sends the given address the message after the given delay.
    */
-  void SendSpawner(const std::string &message);
+  void SendAfter(const Address &address, const std::string &message,
+                 const std::chrono::seconds delay);
   /**
    * Spawn spawns a new state machine.
    */
@@ -87,10 +89,15 @@ public:
   std::function<void()> onExit = []() { _exit(0); };
 
 private:
+  void checkHealthOfSpawned(
+      const std::chrono::time_point<std::chrono::system_clock> now);
   void sendPulseToSpawner();
-  void checkHealthOfSpawned(const std::time_t now);
-  void receiveMessage(const std::time_t now);
-  void handleMessage(const std::time_t now);
+  void
+  sendScheduled(const std::chrono::time_point<std::chrono::system_clock> now);
+  void
+  receiveMessage(const std::chrono::time_point<std::chrono::system_clock> now);
+  void
+  handleMessage(const std::chrono::time_point<std::chrono::system_clock> now);
   void registerMachine(const std::string &machine, const int pid);
   void unregisterMachine();
 
@@ -104,7 +111,16 @@ private:
   char buffer[MAX_PAYLOAD];
   std::map<const std::string, const std::unique_ptr<State>> states;
   std::string current;
-  std::map<const std::string, std::pair<const std::string, time_t>> spawned;
+  struct ScheduledMessage {
+    const Address &address;
+    const std::string message;
+    const std::chrono::time_point<std::chrono::system_clock> time;
+  };
+  std::vector<ScheduledMessage> queue;
+  std::map<const std::string,
+           std::pair<const std::string,
+                     std::chrono::time_point<std::chrono::system_clock>>>
+      spawned;
 };
 
 #endif

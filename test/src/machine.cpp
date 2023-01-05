@@ -1,3 +1,5 @@
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <Wink/machine.h>
@@ -420,48 +422,64 @@ TEST(MachineTest, Send) {
   ASSERT_EQ(10, arg.length);
 }
 
-TEST(MachineTest, SendSelf) {
+TEST(MachineTest, SendAt) {
   Address spawner(":42001");
   Address address(":42002");
   std::string name("test/Test");
-  MockSocket socket;
-
-  // Set mock send result
-  SendResult result = 0;
-  socket.sendResults.push_back(result);
-
+  UDPSocket socket;
   Machine m(spawner, address, name, socket);
-  m.SendSelf(TEST_MESSAGE);
+  // Override exit
+  m.onExit = []() {};
+  m.AddState(std::make_unique<State>(
+      // State Name
+      "main",
+      // Parent State
+      "",
+      // On Entry Action
+      []() {},
+      // On Exit Action
+      []() {},
+      // Receivers
+      std::map<const std::string, Receiver>{
+          {"exit",
+           [&](const Address &sender, std::istream &args) { m.Exit(); }},
+      }));
+  std::thread worker([&]() { m.Start(); });
 
-  // Check socket send
-  ASSERT_EQ(1, socket.sendArgs.size());
-  const auto arg = socket.sendArgs.at(0);
-  ASSERT_EQ(address.ip, arg.toIP);
-  ASSERT_EQ(address.port, arg.toPort);
-  ASSERT_EQ(std::string(TEST_MESSAGE), std::string(arg.buffer));
-  ASSERT_EQ(10, arg.length);
+  auto time = std::chrono::system_clock::now();
+  time += std::chrono::seconds(1);
+  m.SendAt(address, "exit", time);
+
+  worker.join();
 }
 
-TEST(MachineTest, SendSpawner) {
+TEST(MachineTest, SendAfter) {
   Address spawner(":42001");
   Address address(":42002");
   std::string name("test/Test");
-  MockSocket socket;
-
-  // Set mock send result
-  SendResult result = 0;
-  socket.sendResults.push_back(result);
-
+  UDPSocket socket;
   Machine m(spawner, address, name, socket);
-  m.SendSpawner(TEST_MESSAGE);
+  // Override exit
+  m.onExit = []() {};
+  m.AddState(std::make_unique<State>(
+      // State Name
+      "main",
+      // Parent State
+      "",
+      // On Entry Action
+      []() {},
+      // On Exit Action
+      []() {},
+      // Receivers
+      std::map<const std::string, Receiver>{
+          {"exit",
+           [&](const Address &sender, std::istream &args) { m.Exit(); }},
+      }));
+  std::thread worker([&]() { m.Start(); });
 
-  // Check socket send
-  ASSERT_EQ(1, socket.sendArgs.size());
-  const auto arg = socket.sendArgs.at(0);
-  ASSERT_EQ(spawner.ip, arg.toIP);
-  ASSERT_EQ(spawner.port, arg.toPort);
-  ASSERT_EQ(std::string(TEST_MESSAGE), std::string(arg.buffer));
-  ASSERT_EQ(10, arg.length);
+  m.SendAfter(address, "exit", std::chrono::seconds(1));
+
+  worker.join();
 }
 
 TEST(MachineTest, Spawn_Local) {
