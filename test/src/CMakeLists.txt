@@ -15,7 +15,12 @@ set(SOURCE
   "udp.cpp"
 )
 
-include_directories("../include" "../../include")
+set(INCLUDE_DIR
+  "../include"
+  "../../include"
+)
+
+include_directories(${INCLUDE_DIR})
 
 add_executable(${TARGET_NAME} ${SOURCE})
 

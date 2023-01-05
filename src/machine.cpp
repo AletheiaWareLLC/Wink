@@ -1,6 +1,6 @@
 #include <Wink/machine.h>
 
-void Machine::Start(const std::string initial) {
+void Machine::Start(const std::string &initial) {
   // Bind to port
   if (const auto result = socket.Bind(address); result < 0) {
     error() << "Failed to bind to port " << address.port << '\n' << std::flush;
@@ -74,7 +74,7 @@ void Machine::Exit() {
   return;
 }
 
-void Machine::Error(const std::string message) {
+void Machine::Error(const std::string &message) {
   info() << uid << " errored: " << message << '\n' << std::flush;
 
   std::ostringstream oss;
@@ -98,7 +98,7 @@ void Machine::AddState(std::unique_ptr<State> &&state) {
   states.emplace(n, std::move(state));
 }
 
-void Machine::GotoState(const std::string state) {
+void Machine::GotoState(const std::string &state) {
   // Exit current state
   if (const auto it = states.find(current); it != states.end()) {
     it->second->onExit();
@@ -110,7 +110,7 @@ void Machine::GotoState(const std::string state) {
   }
 }
 
-void Machine::Send(const Address &address, const std::string message) {
+void Machine::Send(const Address &address, const std::string &message) {
   info() << uid << " > " << address << ' ' << message << '\n' << std::flush;
   if (const auto result =
           socket.Send(address, message.c_str(), message.length() + 1);
@@ -122,24 +122,36 @@ void Machine::Send(const Address &address, const std::string message) {
 }
 
 void Machine::SendAt(
-    const Address &address, const std::string message,
+    const Address &address, const std::string &message,
     const std::chrono::time_point<std::chrono::system_clock> time) {
   queue.push_back(ScheduledMessage{address, message, time});
 }
 
-void Machine::SendAfter(const Address &address, const std::string message,
+void Machine::SendAfter(const Address &address, const std::string &message,
                         const std::chrono::seconds delay) {
   auto time = std::chrono::system_clock::now();
   time += delay;
   SendAt(address, message, time);
 }
 
-void Machine::Spawn(const std::string machine) {
-  const Address destination(address.ip, 0);
-  Spawn(machine, destination);
+void Machine::Spawn(const std::string &machine) {
+  std::vector<std::string> args;
+  Spawn(machine, args);
 }
 
-void Machine::Spawn(const std::string machine, const Address &address) {
+void Machine::Spawn(const std::string &machine,
+                    const std::vector<std::string> &args) {
+  const Address destination(address.ip, 0);
+  Spawn(machine, destination, args);
+}
+
+void Machine::Spawn(const std::string &machine, const Address &address) {
+  std::vector<std::string> args;
+  Spawn(machine, address, args);
+}
+
+void Machine::Spawn(const std::string &machine, const Address &address,
+                    const std::vector<std::string> &args) {
   // Send Request
   Address server(address.ip, SERVER_PORT);
   std::ostringstream oss;
@@ -147,6 +159,10 @@ void Machine::Spawn(const std::string machine, const Address &address) {
   oss << machine;
   oss << " :";
   oss << address.port;
+  for (const auto &a : args) {
+    oss << ' ';
+    oss << a;
+  }
   const auto s = oss.str();
   Send(server, s);
 }
@@ -275,7 +291,7 @@ void Machine::handleMessage(
   Error("unhandled message: " + m);
 }
 
-void Machine::registerMachine(const std::string machine, const int pid) {
+void Machine::registerMachine(const std::string &machine, const int pid) {
   std::ostringstream oss;
   oss << "register ";
   oss << machine;
