@@ -126,11 +126,23 @@ void Machine::SendSpawner(const std::string &message) {
 }
 
 void Machine::Spawn(const std::string &machine) {
+  std::vector<std::string> args;
+  Spawn(machine, args);
+}
+
+void Machine::Spawn(const std::string &machine,
+                    const std::vector<std::string> &args) {
   const Address destination(address.ip, 0);
-  Spawn(machine, destination);
+  Spawn(machine, destination, args);
 }
 
 void Machine::Spawn(const std::string &machine, const Address &address) {
+  std::vector<std::string> args;
+  Spawn(machine, address, args);
+}
+
+void Machine::Spawn(const std::string &machine, const Address &address,
+                    const std::vector<std::string> &args) {
   // Send Request
   Address server(address.ip, SERVER_PORT);
   std::ostringstream oss;
@@ -138,6 +150,10 @@ void Machine::Spawn(const std::string &machine, const Address &address) {
   oss << machine;
   oss << " :";
   oss << address.port;
+  for (const auto &a : args) {
+    oss << ' ';
+    oss << a;
+  }
   const auto s = oss.str();
   Send(server, s);
 }
