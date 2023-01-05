@@ -107,13 +107,13 @@ int main(int argc, char **argv) {
 
 When a State Machine spawns another, the parent receives lifecycle messages from the child.
 
-In the "success" case, the parent will receive;
+In the `success` case, the parent will receive;
 
 - started - the child indicates it has started and provides the parent with the name of its binary and the address (ip:port) it has bound to.
 - pulsed - the child indicates it is still alive by sending a heartbeat message every 2 seconds.
 - exited - the child indicates it has terminated.
 
-In the "error" case, the parent will receive;
+In the `error` case, the parent will receive;
 
 - started - same as above.
 - pulsed - same as above.
