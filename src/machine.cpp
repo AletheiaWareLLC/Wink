@@ -133,7 +133,7 @@ void Machine::Spawn(const std::string &machine) {
 void Machine::Spawn(const std::string &machine,
                     const std::vector<std::string> &args) {
   const Address destination(address.ip, 0);
-  Spawn(machine, destination,args);
+  Spawn(machine, destination, args);
 }
 
 void Machine::Spawn(const std::string &machine, const Address &address) {
