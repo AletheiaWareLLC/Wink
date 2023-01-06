@@ -22,10 +22,10 @@ Wink is framework for developing Fault Tolerant Systems with Asynchronous Concur
 
 A State Machine;
 - Runs Independently and Concurrently for Fault Isolation.
-- Has a Lifecycle that is monitored by the Spawner.
+- Has a Lifecycle that is monitored by the Spawner for Error Detection and Resolution.
 - Communicates Asynchronously to minimize Latency and maximize Throughput.
-- Can be Updated and Restarted without affecting others
-- Writes logs to either stdout or the filesystem.
+- Can be Updated and Restarted without affecting others State Machines.
+- Writes logs to either stdout or the filesystem for Debuggability.
 - Has a Hierarchy of States to minimize Code Duplication.
 - Is Uniquely Identified by its Binary Name and Network Address;
   - local `:<port>` or `localhost:<port>` or `127.0.0.1:<port>`
@@ -52,6 +52,7 @@ The optional empty receiver is triggered if no other receivers match.
 #include <string>
 
 #include <Wink/address.h>
+#include <Wink/log.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
@@ -106,13 +107,13 @@ int main(int argc, char **argv) {
 
 When a State Machine spawns another, the parent receives lifecycle messages from the child.
 
-In the "success" case, the parent will receive;
+In the `success` case, the parent will receive;
 
 - started - the child indicates it has started and provides the parent with the name of its binary and the address (ip:port) it has bound to.
 - pulsed - the child indicates it is still alive by sending a heartbeat message every 2 seconds.
 - exited - the child indicates it has terminated.
 
-In the "error" case, the parent will receive;
+In the `error` case, the parent will receive;
 
 - started - same as above.
 - pulsed - same as above.
@@ -130,6 +131,7 @@ When a parent is notified that a child has errored, it can chose to do nothing, 
 #include <string>
 
 #include <Wink/address.h>
+#include <Wink/log.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
@@ -204,6 +206,7 @@ int main(int argc, char **argv) {
 #include <string>
 
 #include <Wink/address.h>
+#include <Wink/log.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
@@ -267,7 +270,7 @@ Parent: 127.0.0.1:64701 family/Child has exited                                 
 Parent: OnExit                                                                  # Parent Exits `main` State
 ```
 
-## Repository
+## Repository Layout
 
  - include: header files
  - samples: code samples

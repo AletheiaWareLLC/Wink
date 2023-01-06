@@ -2,6 +2,7 @@
 #include <string>
 
 #include <Wink/address.h>
+#include <Wink/log.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
 
