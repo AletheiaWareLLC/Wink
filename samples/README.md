@@ -74,6 +74,19 @@ send <switch> on
 send <switch> off
 ```
 
+## Time
+
+Demonstrates various time-related use cases;
+- After - send a message after a given delay
+- At - send a message at a specific time
+
+### Usage
+
+```
+start time/After
+start time/At
+```
+
 ## Useless
 
 A Useless State Machine that exits as soon as it is started.
