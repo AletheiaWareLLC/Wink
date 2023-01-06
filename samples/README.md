@@ -100,7 +100,7 @@ start time/At
 
 ### StopWatch
 
-Implements a StopWatch for calculating the duration between two events.
+Implements a StopWatch for calculating how much time has elapsed between the watch being started and stopped.
 
 This state machine has two states; `idle` and `timing`.
 
