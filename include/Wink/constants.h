@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+typedef unsigned char uchar;
 typedef unsigned int uint;
 typedef unsigned short ushort;
 

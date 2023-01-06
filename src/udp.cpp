@@ -5,12 +5,12 @@
 
 UDPSocket::UDPSocket() : sock(socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) {
   if (sock < 0) {
-    error() << "Failed to create socket: " << strerror(errno) << '\n'
+    error() << "Failed to create socket: " << std::strerror(errno) << '\n'
             << std::flush;
   }
   auto on = 1;
   if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0) {
-    error() << "Failed to set reuse option: " << strerror(errno) << '\n'
+    error() << "Failed to set reuse option: " << std::strerror(errno) << '\n'
             << std::flush;
   }
 }

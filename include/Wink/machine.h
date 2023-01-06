@@ -1,7 +1,7 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
-#include <ctime>
+#include <chrono>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -33,7 +33,7 @@ public:
    * will start. If empty, the state machine will start in the
    * first state that was added.
    */
-  void Start(const std::string initial = "");
+  void Start(const std::string &initial = "");
   /**
    * Exit immediately ceases execution of the state machine and sends an
    * 'exited' message to the machine which spawned this machine.
@@ -44,7 +44,7 @@ public:
    * 'errored' message and the given error message to the machine which
    * spawned this machine.
    */
-  void Error(const std::string message);
+  void Error(const std::string &message);
   /**
    * AddState adds the given state to this state machine.
    */
@@ -52,36 +52,53 @@ public:
   /**
    * GotoState transitions the state machine to the given state.
    */
-  void GotoState(const std::string state);
+  void GotoState(const std::string &state);
   /**
    * Send transmits a message to the given address.
    */
-  void Send(const Address &address, const std::string message);
+  void Send(const Address &address, const std::string &message);
   /**
-   * SendSelf transmits a message to this machine.
+   * SendAt sends the given address the message at the given time.
    */
-  void SendSelf(const std::string message);
+  void SendAt(const Address &address, const std::string &message,
+              const std::chrono::time_point<std::chrono::system_clock> time);
   /**
-   * SendSpawner transmits a message to the machine which spawned this machine.
+   * SendAfter sends the given address the message after the given delay.
    */
-  void SendSpawner(const std::string message);
+  void SendAfter(const Address &address, const std::string &message,
+                 const std::chrono::seconds delay);
   /**
    * Spawn spawns a new state machine.
    */
-  void Spawn(const std::string machine);
+  void Spawn(const std::string &machine);
+  /**
+   * Spawn spawns a new state machine with the given arguments.
+   */
+  void Spawn(const std::string &machine, const std::vector<std::string> &args);
   /**
    * Spawn spawns a new state machine at the given address.
    */
-  void Spawn(const std::string machine, const Address &address);
+  void Spawn(const std::string &machine, const Address &address);
+  /**
+   * Spawn spawns a new state machine at the given address with the given
+   * arguments.
+   */
+  void Spawn(const std::string &machine, const Address &address,
+             const std::vector<std::string> &args);
 
   std::function<void()> onExit = []() { _exit(0); };
 
 private:
+  void checkHealthOfSpawned(
+      const std::chrono::time_point<std::chrono::system_clock> now);
   void sendPulseToSpawner();
-  void checkHealthOfSpawned(const std::time_t now);
-  void receiveMessage(const std::time_t now);
-  void handleMessage(const std::time_t now);
-  void registerMachine(const std::string machine, const int pid);
+  void
+  sendScheduled(const std::chrono::time_point<std::chrono::system_clock> now);
+  void
+  receiveMessage(const std::chrono::time_point<std::chrono::system_clock> now);
+  void
+  handleMessage(const std::chrono::time_point<std::chrono::system_clock> now);
+  void registerMachine(const std::string &machine, const int pid);
   void unregisterMachine();
 
   Address &spawner;
@@ -94,7 +111,16 @@ private:
   char buffer[MAX_PAYLOAD];
   std::map<const std::string, const std::unique_ptr<State>> states;
   std::string current;
-  std::map<const std::string, std::pair<const std::string, time_t>> spawned;
+  struct ScheduledMessage {
+    const Address &address;
+    const std::string message;
+    const std::chrono::time_point<std::chrono::system_clock> time;
+  };
+  std::vector<ScheduledMessage> queue;
+  std::map<const std::string,
+           std::pair<const std::string,
+                     std::chrono::time_point<std::chrono::system_clock>>>
+      spawned;
 };
 
 #endif

@@ -25,14 +25,16 @@ int logToFile(const std::string &directory, const std::string &name) {
 
   if (const auto d = directory.c_str(); stat(d, &st) == -1) {
     if (const auto result = mkdir(d, 0777); result < 0) {
-      error() << "Failed to make log directory: " << strerror(errno) << '\n'
+      error() << "Failed to make log directory: " << std::strerror(errno)
+              << '\n'
               << std::flush;
       return -1;
     }
   }
 
-  std::time_t t = std::time(nullptr);
-  std::tm tm = *std::gmtime(&t);
+  const auto now = std::chrono::system_clock::now();
+  const auto tt = std::chrono::system_clock::to_time_t(now);
+  const auto tm = *std::gmtime(&tt);
 
   std::ostringstream filename;
   filename << std::put_time(&tm, "%Y%m%d%H%M%S");
@@ -43,8 +45,8 @@ int logToFile(const std::string &directory, const std::string &name) {
 
   int fd = open(filepath.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
   if (fd < 0) {
-    error() << "Failed to open file: " << filepath << ": " << strerror(errno)
-            << '\n'
+    error() << "Failed to open file: " << filepath << ": "
+            << std::strerror(errno) << '\n'
             << std::flush;
     return -1;
   }
