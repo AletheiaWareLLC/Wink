@@ -22,10 +22,10 @@ Wink is framework for developing Fault Tolerant Systems with Asynchronous Concur
 
 A State Machine;
 - Runs Independently and Concurrently for Fault Isolation.
-- Has a Lifecycle that is monitored by the Spawner.
+- Has a Lifecycle that is monitored by the Spawner for Error Detection and Resolution.
 - Communicates Asynchronously to minimize Latency and maximize Throughput.
-- Can be Updated and Restarted without affecting others
-- Writes logs to either stdout or the filesystem.
+- Can be Updated and Restarted without affecting others State Machines.
+- Writes logs to either stdout or the filesystem for Debuggability.
 - Has a Hierarchy of States to minimize Code Duplication.
 - Is Uniquely Identified by its Binary Name and Network Address;
   - local `:<port>` or `localhost:<port>` or `127.0.0.1:<port>`
