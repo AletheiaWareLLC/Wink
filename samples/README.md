@@ -74,9 +74,35 @@ send <switch> on
 send <switch> off
 ```
 
-## StopWatch
+## Time
 
-The StopWatch state machine has two states; `idle` and `timing`.
+Demonstrates various time-related use cases.
+
+### After
+
+Send a message after a given delay.
+
+#### Usage
+
+```
+start time/After
+```
+
+### At
+
+Send a message at a specific time.
+
+#### Usage
+
+```
+start time/At
+```
+
+### StopWatch
+
+Implements a StopWatch for calculating the duration between two events.
+
+This state machine has two states; `idle` and `timing`.
 
 When the machine is in state `idle` and receives;
 
@@ -91,12 +117,13 @@ When the machine is in state `timing` and receives;
 
 The state `idle` is the parent of timing, so when timing receives an `idle`, `start`, or `exit` message, it is handled by the parent state.
 
-### Usage
+#### Usage
 
 ```
 start time/StopWatch
 send <stopwatch> start
 send <stopwatch> stop
+
 ```
 
 ## Useless
