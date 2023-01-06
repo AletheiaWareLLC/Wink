@@ -52,7 +52,13 @@ start forward/Forward <destination>
 
 ## Hierarchy
 
-Demonstrates a Hierarchical State Machine.
+Demonstrates different tree shapes of Hierarchical State Machines;
+
+- Empty - a tree with no nodes
+- Leaf - a tree with a single leaf node.
+- Simple - a tree with a parent and two child leaf nodes.
+- Bigger - a tree with three levels of nodes.
+- Forrest - a set of multiple trees ranging in size and shape.
 
 ## Network
 
