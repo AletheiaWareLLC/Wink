@@ -8,7 +8,7 @@ set(SOURCE
     "empty.cpp"
 )
 
-include_directories("../../include")
+include_directories(${INCLUDE_DIR})
 
 add_executable(${TARGET_NAME} ${SOURCE})
 
@@ -20,7 +20,7 @@ set(SOURCE
     "leaf.cpp"
 )
 
-include_directories("../../include")
+include_directories(${INCLUDE_DIR})
 
 add_executable(${TARGET_NAME} ${SOURCE})
 
@@ -32,7 +32,7 @@ set(SOURCE
     "simple.cpp"
 )
 
-include_directories("../../include")
+include_directories(${INCLUDE_DIR})
 
 add_executable(${TARGET_NAME} ${SOURCE})
 
@@ -44,7 +44,7 @@ set(SOURCE
     "bigger.cpp"
 )
 
-include_directories("../../include")
+include_directories(${INCLUDE_DIR})
 
 add_executable(${TARGET_NAME} ${SOURCE})
 
