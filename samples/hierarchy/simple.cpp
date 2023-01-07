@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
   Address spawner(argv[1]);
   Address address(argv[2]);
   UDPSocket socket;
-  Machine m(spawner, address, "hierarchy/Hierarchy", socket);
+  Machine m(spawner, address, "hierarchy/Simple", socket);
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -39,11 +39,11 @@ int main(int argc, char **argv) {
 
   m.AddState(std::make_unique<State>(
       // State Name
-      "Child",
+      "Leaf1",
       // Parent State
       "Parent",
       // On Entry Action
-      []() { info() << "Child On Entry\n"
+      []() { info() << "Leaf1 On Entry\n"
                     << std::flush; },
       // On Exit Action
       []() {},
@@ -53,9 +53,29 @@ int main(int argc, char **argv) {
            [&](const Address &sender, std::istream &args) {
              std::ostringstream os;
              os << args.rdbuf();
-             info() << "Child: " << os.str() << '\n' << std::flush;
+             info() << "Leaf1: " << os.str() << '\n' << std::flush;
            }},
       }));
 
-  m.Start("Child");
+  m.AddState(std::make_unique<State>(
+      // State Name
+      "Leaf2",
+      // Parent State
+      "Parent",
+      // On Entry Action
+      []() { info() << "Leaf2 On Entry\n"
+                    << std::flush; },
+      // On Exit Action
+      []() {},
+      // Receivers
+      std::map<const std::string, Receiver>{
+          {"Test",
+           [&](const Address &sender, std::istream &args) {
+             std::ostringstream os;
+             os << args.rdbuf();
+             info() << "Leaf2: " << os.str() << '\n' << std::flush;
+           }},
+      }));
+
+  m.Start("Leaf2");
 }
