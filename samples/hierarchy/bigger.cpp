@@ -58,26 +58,6 @@ int main(int argc, char **argv) {
 
   m.AddState(std::make_unique<State>(
       // State Name
-      "Leaf2",
-      // Parent State
-      "Parent",
-      // On Entry Action
-      []() { info() << "Leaf2 On Entry\n"
-                    << std::flush; },
-      // On Exit Action
-      []() {},
-      // Receivers
-      std::map<const std::string, Receiver>{
-          {"Test",
-           [&](const Address &sender, std::istream &args) {
-             std::ostringstream os;
-             os << args.rdbuf();
-             info() << "Leaf2: " << os.str() << '\n' << std::flush;
-           }},
-      }));
-
-  m.AddState(std::make_unique<State>(
-      // State Name
       "Child1",
       // Parent State
       "Parent",
@@ -93,6 +73,26 @@ int main(int argc, char **argv) {
              std::ostringstream os;
              os << args.rdbuf();
              info() << "Child1: " << os.str() << '\n' << std::flush;
+           }},
+      }));
+
+  m.AddState(std::make_unique<State>(
+      // State Name
+      "Leaf2",
+      // Parent State
+      "Child1",
+      // On Entry Action
+      []() { info() << "Leaf2 On Entry\n"
+                    << std::flush; },
+      // On Exit Action
+      []() {},
+      // Receivers
+      std::map<const std::string, Receiver>{
+          {"Test",
+           [&](const Address &sender, std::istream &args) {
+             std::ostringstream os;
+             os << args.rdbuf();
+             info() << "Leaf2: " << os.str() << '\n' << std::flush;
            }},
       }));
 

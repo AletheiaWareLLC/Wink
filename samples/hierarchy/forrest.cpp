@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
   m.AddState(std::make_unique<State>(
       "Leaf4",
-      "Child1",
+      "Child2",
       []() {},
       []() {},
       std::map<const std::string, Receiver>{
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
 
   m.AddState(std::make_unique<State>(
       "Leaf5",
-      "Child1",
+      "Child2",
       []() {},
       []() {},
       std::map<const std::string, Receiver>{
