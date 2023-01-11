@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include <Wink/address.h>
@@ -25,18 +26,14 @@ int main(int argc, char **argv) {
       // Parent State
       "",
       // On Entry Action
-      []() {},
+      [&]() {
+        info() << "UID: " << m.UID() << '\n' << std::flush;
+        m.Exit();
+      },
       // On Exit Action
       []() {},
       // Receivers
-      std::map<const std::string, Receiver>{
-          {"",
-           [&](const Address &sender, std::istream &args) {
-             std::ostringstream os;
-             os << args.rdbuf();
-             m.Send(sender, os.str());
-           }},
-      }));
+      std::map<const std::string, Receiver>{}));
 
   m.Start();
 }

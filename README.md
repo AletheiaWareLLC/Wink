@@ -28,8 +28,14 @@ A State Machine;
 - Writes logs to either stdout or the filesystem for Debuggability.
 - Has a Hierarchy of States to minimize Code Duplication.
 - Is Uniquely Identified by its Binary Name and Network Address;
-  - local `:<port>` or `localhost:<port>` or `127.0.0.1:<port>`
-  - remote `<ip>:<port>`
+  - binary name consists of;
+    - package and executable: `family/Parent` or `family/Child`
+    - optional [semantic versioning](https://semver.org/): `family/Parent_v0.0.1`
+    - optional tag: `family/Child:Alice` or `family/Child:Bob`
+    - compound example: `family/Child_v1.2.3:Alice`
+  - address can either be local, or remote;
+    - local: `:<port>` or `localhost:<port>` or `127.0.0.1:<port>`
+    - remote: `<ip>:<port>`
 
 ### States
 
@@ -58,15 +64,16 @@ The optional empty receiver is triggered if no other receivers match.
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+    error() << "Incorrect parameters, expected <address> <spawner>\n"
             << std::flush;
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, "switch/Switch", socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -137,15 +144,16 @@ When a parent is notified that a child has errored, it can chose to do nothing, 
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+    error() << "Incorrect parameters, expected <address> <spawner>\n"
             << std::flush;
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, "family/Parent", socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -212,15 +220,16 @@ int main(int argc, char **argv) {
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+    error() << "Incorrect parameters, expected <address> <spawner>\n"
             << std::flush;
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, "family/Child", socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   m.AddState(std::make_unique<State>(
       // State Name

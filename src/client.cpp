@@ -58,7 +58,7 @@ int StartMachine(Socket &socket, Address &address, const std::string &binary,
   }
   std::string b;
   iss >> b;
-  if (b != binary) {
+  if (!b.starts_with(binary)) {
     error() << "Incorrect machine binary started. Expected: \"" << binary
             << "\", Got: \"" << b << "\"\n"
             << std::flush;

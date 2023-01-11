@@ -20,7 +20,7 @@ TEST(ServerTest, Start) {
   UDPSocket socket;
   Server server(address, socket);
   const std::vector<std::string> args;
-  ASSERT_EQ(0, server.Start("./samples/useless/Useless", args));
+  ASSERT_EQ(0, server.Start("./samples/", "useless/Useless", args));
 }
 
 TEST(ServerTest, Stop) {

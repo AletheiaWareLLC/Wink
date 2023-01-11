@@ -60,24 +60,38 @@ int Server::Serve(const std::string &directory) {
         Stop(port);
       }
 
+      // Split machine into name (directory/file) and tag
+      std::string name = machine;
+      std::string tag = "";
+      if (const auto i = machine.find(':'); i != std::string::npos) {
+        name = machine.substr(0, i - 1);
+        tag = machine.substr(i + 1);
+      }
+
+      // Resolve correct version if any (ie. <name> or <name>_v<version>)
+      name = resolveVersion(directory, name);
+
+      // Update machine to include version if any (ie. <name>:<tag> or <name>_v<version>:<tag>)
+      machine = name + tag;
+
+      // Resolve binary file (ie. <directory>/<name> or <directory>/<name>_v<version>)
+      std::filesystem::path binary(directory);
+      binary /= name;
+
+      // Create parameter list
       std::vector<std::string> parameters;
 
-      std::stringstream bs;
-      bs << directory;
-      bs << '/';
-      bs << machine;
-      const auto b = bs.str();
-      parameters.push_back(b);
-
-      std::stringstream ss;
-      ss << sender;
-      const auto s = ss.str();
-      parameters.push_back(s);
+      parameters.push_back(machine);
 
       std::stringstream as;
       as << destination;
       const auto a = as.str();
       parameters.push_back(a);
+
+      std::stringstream ss;
+      ss << sender;
+      const auto s = ss.str();
+      parameters.push_back(s);
 
       while (iss.good()) {
         std::string p;
@@ -85,7 +99,8 @@ int Server::Serve(const std::string &directory) {
         parameters.push_back(p);
       }
 
-      if (const auto result = Start(machine, parameters); result < 0) {
+      if (const auto result = Start(binary.string(), machine, parameters);
+          result < 0) {
         error() << "Failed to start process\n" << std::flush;
         return result;
       }
@@ -130,7 +145,7 @@ int Server::Serve(const std::string &directory) {
   return 0;
 }
 
-int Server::Start(const std::string &machine,
+int Server::Start(const std::string &binary, const std::string &machine,
                   const std::vector<std::string> &parameters) {
   // Fork child process
   pid_t pid;
@@ -164,7 +179,7 @@ int Server::Start(const std::string &machine,
       i++;
     }
 
-    const auto result = execv(args[0], args);
+    const auto result = execv(binary.c_str(), args);
 
     for (i = 0; i < length; i++) {
       delete[] args[i];
@@ -201,4 +216,39 @@ int Server::Stop(int port) {
     pids.erase(port);
   }
   return pid;
+}
+
+std::string resolveVersion(const std::string &directory,
+                           const std::string &machine) {
+  std::filesystem::path binary(directory);
+  binary /= machine;
+
+  if (!std::filesystem::exists(binary)) {
+    // Check if <binary>_v<semver> exists, if so use latest version
+    const auto bin = binary.string() + "_v";
+    const auto len = bin.length();
+    std::vector<SemVer> versions;
+    const auto directory = binary.parent_path();
+    for (const auto &entry : std::filesystem::directory_iterator{directory}) {
+      if (entry.is_regular_file()) {
+        const auto &entry_path = entry.path().string();
+        if (entry_path.starts_with(bin)) {
+          versions.push_back(SemVer(entry_path.substr(len)));
+        }
+      }
+    }
+    if (!versions.empty()) {
+      sort(versions.begin(), versions.end());
+      for (const auto &v : versions) {
+        info() << v.vtos() << '\n' << std::flush;
+      }
+
+      std::ostringstream ms;
+      ms << machine;
+      ms << "_v";
+      ms << versions.back();
+      return ms.str();
+    }
+  }
+  return machine;
 }

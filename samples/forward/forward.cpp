@@ -9,16 +9,16 @@
 int main(int argc, char **argv) {
   if (argc < 4) {
     error()
-        << "Incorrect parameters, expected <spawner> <address> <destination>\n"
+        << "Incorrect parameters, expected <address> <spawner> <destination>\n"
         << std::flush;
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
-  std::string name("forward/Forward");
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, name, socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   Address destination(argv[3]);
 
