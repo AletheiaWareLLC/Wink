@@ -27,6 +27,7 @@ int main(int argc, char **argv) {
       // On Entry Action
       [&]() {
         info() << "Parent: OnEntry\n" << std::flush;
+        // Spawn two identical children, differentiated by a tag
         m.Spawn("family/Child:Alice");
         m.Spawn("family/Child:Bob");
       },

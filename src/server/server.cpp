@@ -64,8 +64,8 @@ int Server::Serve(const std::string &directory) {
       std::string name = machine;
       std::string tag = "";
       if (const auto i = machine.find(':'); i != std::string::npos) {
-        name = machine.substr(0, i - 1);
-        tag = machine.substr(i + 1);
+        name = machine.substr(0, i);
+        tag = machine.substr(i);
       }
 
       // Resolve correct version if any (ie. <name> or <name>_v<version>)
