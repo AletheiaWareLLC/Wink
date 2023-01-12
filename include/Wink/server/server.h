@@ -28,7 +28,7 @@ public:
   Server(Server &&m) = delete;
   ~Server() {}
   int Serve(const std::string &directory);
-  int Start(const std::string &binary, const std::string &machine,
+  int Start(const std::string &binary,
             const std::vector<std::string> &parameters);
   int Stop(int port);
 

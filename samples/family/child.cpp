@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -26,11 +27,17 @@ int main(int argc, char **argv) {
       // Parent State
       "",
       // On Entry Action
-      [&]() { m.Error("AHHHHH"); },
+      [&]() {
+        // Schedule message to be sent to self after 10s
+        m.SendAfter(address, "error", std::chrono::seconds(10));
+      },
       // On Exit Action
       []() {},
       // Receivers
-      std::map<const std::string, Receiver>{}));
+      std::map<const std::string, Receiver>{
+          {"error", [&](const Address &sender,
+                        std::istream &args) { m.Error("AHHHHH"); }},
+      }));
 
   m.Start();
 }

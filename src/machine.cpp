@@ -263,6 +263,10 @@ void Machine::handleMessage(
     std::string name;
     iss >> name;
     spawned.emplace(key, std::make_pair(name, now));
+    // Put name back into the stream
+    for (int i = 0; i < name.length(); i++) {
+      iss.unget();
+    }
   } else if (m == "exited") {
     spawned.erase(key);
   } else if (m == "pulsed") {
