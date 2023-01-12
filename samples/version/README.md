@@ -1,9 +1,9 @@
-# Useless
+# Version
 
-A Useless State Machine that exits as soon as it is started.
+A State Machine that is compiled into multiple versions to show how they can coexist.
 
 ## Usage
 
 ```
-start useless/Useless
+docker compose up
 ```
