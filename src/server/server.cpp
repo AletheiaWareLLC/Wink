@@ -69,11 +69,11 @@ int Server::Serve(const std::string &directory) {
       }
 
       // Resolve correct version (if any).
-      // ie. <name> or <name>_v<version>.
+      // ie. <name> or <name><version>.
       name = resolveVersion(directory, name);
 
       // Resolve binary file.
-      // ie. <directory>/<name> or <directory>/<name>_v<version>.
+      // ie. <directory>/<name> or <directory>/<name><version>.
       std::filesystem::path binary(directory);
       binary /= name;
 
@@ -82,8 +82,8 @@ int Server::Serve(const std::string &directory) {
 
       // First parameter is name of the machine, optionally including version
       // and tag. This will also become the log file name (if enabled).
-      // ie. <name>, <name>_v<version>, <name>:<tag>, or
-      // <name>_v<version>:<tag>.
+      // ie. <name>, <name><version>, <name>:<tag>, or
+      // <name><version>:<tag>.
       parameters.push_back(name + tag);
 
       // Second parameter is the address of the machine.
@@ -229,8 +229,8 @@ std::string resolveVersion(const std::string &directory,
   binary /= machine;
 
   if (!std::filesystem::exists(binary)) {
-    // Check if <binary>_v<semver> exists, if so use latest version
-    const auto bin = binary.string() + "_v";
+    // Check if <binary><semver> exists, if so use latest version
+    const auto bin = binary.string();
     const auto len = bin.length();
     std::vector<SemVer> versions;
     const auto directory = binary.parent_path();
@@ -247,7 +247,6 @@ std::string resolveVersion(const std::string &directory,
 
       std::ostringstream ms;
       ms << machine;
-      ms << "_v";
       // Last element in sorted vector is latest version
       ms << versions.back();
       return ms.str();

@@ -4,7 +4,7 @@ set(INCLUDE_DIR "../../include")
 
 foreach(version IN ITEMS 0.0.1 0.0.2 0.0.3)
 
-    set(TARGET_NAME Version_v${version})
+    set(TARGET_NAME Version${version})
 
     set(SOURCE
         "version.cpp"

@@ -25,11 +25,11 @@ services:
       - |
         sleep 1
         # Start Version 0.0.1
-        ./build/src/Wink start -a 10.0.0.4:42001 -f true version/Version_v0.0.1 10.0.0.2:64001
+        ./build/src/Wink start -a 10.0.0.4:42001 -f true version/Version0.0.1 10.0.0.2:64001
         # Start Version 0.0.2
-        ./build/src/Wink start -a 10.0.0.4:42001 -f true version/Version_v0.0.2 10.0.0.2:64002
+        ./build/src/Wink start -a 10.0.0.4:42001 -f true version/Version0.0.2 10.0.0.2:64002
         # Start Version 0.0.3
-        ./build/src/Wink start -a 10.0.0.4:42001 -f true version/Version_v0.0.3 10.0.0.2:64003
+        ./build/src/Wink start -a 10.0.0.4:42001 -f true version/Version0.0.3 10.0.0.2:64003
         # Start Latest Version
         ./build/src/Wink start -a 10.0.0.4:42001 -f true version/Version 10.0.0.2:64000
     expose:

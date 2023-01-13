@@ -30,9 +30,9 @@ A State Machine;
 - Is Uniquely Identified by its Binary Name and Network Address;
   - binary name consists of;
     - package and executable: `family/Parent` or `family/Child`
-    - optional [semantic versioning](https://semver.org/): `family/Parent_v0.0.1`
+    - optional [semantic versioning](https://semver.org/): `family/Parent0.0.1`
     - optional tag: `family/Child:Alice` or `family/Child:Bob`
-    - compound example: `family/Child_v1.2.3:Alice`
+    - compound example: `family/Child1.2.3:Alice`
   - address can either be local, or remote;
     - local: `:<port>` or `localhost:<port>` or `127.0.0.1:<port>`
     - remote: `<ip>:<port>`
