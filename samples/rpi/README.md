@@ -2,7 +2,13 @@
 
 This is a collection of samples showing how to use the Wink framework to build and run State Machines on the Raspberry Pi platform.
 
-First, power up your Raspberry Pi, connect it to your local network, update to the latest version of Raspbian OS and install the latest version of the [WiringPi](http://wiringpi.com/) library.
+First, power up your Raspberry Pi, connect it to your local network, update to the latest version of Raspbian OS and install the latest version of [Clang](https://clang.llvm.org/), [CMake](https://cmake.org/), and [WiringPi](http://wiringpi.com/).
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install clang cmake wiringpi
+```
 
 Then, clone the Wink repository, build the project, and finally start the server;
 ```
@@ -13,8 +19,8 @@ git clone https://github.com/AletheiaWareLLC/Wink.git
 cd Wink
 
 # Build Wink Framework, including the Raspberry Pi samples which are not built by default
-cmake -S . -B build
-cmake --build build -DBUILD_RPI_SAMPLES=ON
+cmake -S . -B build -D BUILD_RPI_SAMPLES=ON
+cmake --build build
 
 # Start Wink Server
 ./build/src/WinkServer serve build/samples/
