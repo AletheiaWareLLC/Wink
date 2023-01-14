@@ -1,6 +1,6 @@
 # Wink
 
-Wink is framework for developing Fault Tolerant Systems with Asynchronous Concurrent Independent Hierarchical Finite State Machine.
+Wink is framework for developing Fault Tolerant Systems with Asynchronous Concurrent Independent Hierarchical Finite State Machines.
 
 ## Fault Tolerance
 
@@ -14,7 +14,7 @@ Wink is framework for developing Fault Tolerant Systems with Asynchronous Concur
 
 1. Isolated Fault Units - split software into multiple small independent modules that run concurrently to achieve a single objective or fail fast.
 2. Supervision Tree - modules can monitor the lifcycles of submodules.
-3. Message Passing - modules communicate asynchronously.
+3. Message Passing - modules communicate asynchronously and do not share state.
 4. Live Upgrade - modules can be updated without restarting the whole system.
 5. Persistent Records - logs are written to storage that can survive reboot.
 
@@ -25,7 +25,7 @@ A State Machine;
 - Has a Lifecycle that is monitored by the Spawner for Error Detection and Resolution.
 - Communicates Asynchronously to minimize Latency and maximize Throughput.
 - Can be Updated and Restarted without affecting others State Machines.
-- Writes logs to either stdout or the filesystem for Debuggability.
+- Writes Logs to either stdout or the filesystem for Debuggability.
 - Has a Hierarchy of States to minimize Code Duplication.
 - Is Uniquely Identified by its Binary Name and Network Address;
   - binary name consists of;
@@ -49,7 +49,7 @@ An action is triggered when a state is entered or exited.
 
 A receiver is triggered upon receipt of a matching message.
 
-The optional empty receiver is triggered if no other receivers match.
+If the optional empty receiver exists, it is triggered if no other receivers match, else the unhandled message is handled by the parent state. If no parent exists, or the message is not handled by the hierarchy, an error is raised.
 
 ### Example
 
