@@ -70,6 +70,14 @@ std::ostream &operator<<(std::ostream &os, const SemVer &v) {
   return os;
 }
 
+void splitLabel(std::vector<std::string> &v, std::string s) {
+  std::istringstream iss(s);
+  std::string item;
+  while (std::getline(iss, item, '.')) {
+    v.push_back(item);
+  }
+}
+
 bool SemVer::operator<(const SemVer &rhs) const {
   if (_major < rhs._major) {
     return true;
@@ -86,7 +94,32 @@ bool SemVer::operator<(const SemVer &rhs) const {
   } else if (_prerelease.empty() && !rhs._prerelease.empty()) {
     return false;
   } else if (!_prerelease.empty() && !rhs._prerelease.empty()) {
-    // TODO compare prerelease components
+    std::vector<std::string> ls;
+    std::vector<std::string> rs;
+    splitLabel(ls, _prerelease);
+    splitLabel(rs, rhs._prerelease);
+    for (uint i = 0;; i++) {
+      if (i < ls.size() && i < rs.size()) {
+        if (ls[i] == rs[i]) {
+          continue;
+        }
+        const auto ld = std::isdigit(ls[i][0]);
+        const auto rd = std::isdigit(rs[i][0]);
+        if (ld && rd) {
+          // Compare numerically
+          return std::stoi(ls[i]) < std::stoi(rs[i]);
+        } else if (!ld && !rd) {
+          // Compare alphabetically
+          return ls[i] < rs[i];
+        } else {
+          return ld;
+        }
+      } else if (i >= ls.size() && i >= rs.size()) {
+        break;
+      } else {
+        return i < rs.size();
+      }
+    }
   }
   // Compare builds
   if (!_build.empty() && rhs._build.empty()) {
@@ -94,7 +127,32 @@ bool SemVer::operator<(const SemVer &rhs) const {
   } else if (_build.empty() && !rhs._build.empty()) {
     return false;
   } else if (!_build.empty() && !rhs._build.empty()) {
-    // TODO compare build components
+    std::vector<std::string> ls;
+    std::vector<std::string> rs;
+    splitLabel(ls, _build);
+    splitLabel(rs, rhs._build);
+    for (uint i = 0;; i++) {
+      if (i < ls.size() && i < rs.size()) {
+        if (ls[i] == rs[i]) {
+          continue;
+        }
+        const auto ld = std::isdigit(ls[i][0]);
+        const auto rd = std::isdigit(rs[i][0]);
+        if (ld && rd) {
+          // Compare numerically
+          return std::stoi(ls[i]) < std::stoi(rs[i]);
+        } else if (!ld && !rd) {
+          // Compare alphabetically
+          return ls[i] < rs[i];
+        } else {
+          return ld;
+        }
+      } else if (i >= ls.size() && i >= rs.size()) {
+        break;
+      } else {
+        return i < rs.size();
+      }
+    }
   }
   return false;
 }

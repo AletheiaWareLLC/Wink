@@ -3,6 +3,9 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
+
+#include <Wink/constants.h>
 
 class SemVer {
 public:
