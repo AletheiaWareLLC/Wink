@@ -41,3 +41,7 @@ Demonstrates various time-related use cases.
 ## [Useless](useless/README.md)
 
 A Useless State Machine that exits as soon as it is started.
+
+## [Version](version/README.md)
+
+Demonstrates how multiple versions of the same State Machine can coexist.

@@ -7,11 +7,17 @@
 #include <WinkTest/constants.h>
 #include <WinkTest/socket.h>
 
+TEST(MachineTest, UID) {
+  // TODO Basic
+  // TODO Tag
+  // TODO Version
+}
+
 TEST(MachineTest, Start) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
   // Set mock bind result
   {
     BindResult result;
@@ -49,7 +55,7 @@ TEST(MachineTest, Start) {
   int mainOnEntry;
   int mainOnExit;
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
   // Override exit
   m.onExit = []() {};
   m.AddState(std::make_unique<State>(
@@ -68,7 +74,7 @@ TEST(MachineTest, Start) {
       std::map<const std::string, Receiver>{}));
   m.Start();
 
-  ASSERT_EQ("127.0.0.1:42002 test/Test", m.Uid());
+  ASSERT_EQ("test/Test@127.0.0.1:42002", m.UID());
 
   // Bind call
   { ASSERT_EQ(1, socket.bindArgs.size()); }
@@ -122,10 +128,10 @@ TEST(MachineTest, Start) {
 }
 
 TEST(MachineTest, Start_InitialState) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
   // Set mock bind result
   {
     BindResult result;
@@ -165,7 +171,7 @@ TEST(MachineTest, Start_InitialState) {
   int secondOnEntry;
   int secondOnExit;
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
   // Override exit
   m.onExit = []() {};
   m.AddState(std::make_unique<State>(
@@ -206,7 +212,7 @@ TEST(MachineTest, Start_InitialState) {
       std::map<const std::string, Receiver>{}));
   m.Start("second");
 
-  ASSERT_EQ("127.0.0.1:42002 test/Test", m.Uid());
+  ASSERT_EQ("test/Test@127.0.0.1:42002", m.UID());
 
   // Bind call
   { ASSERT_EQ(1, socket.bindArgs.size()); }
@@ -269,17 +275,17 @@ TEST(MachineTest, Start_Heartbeat) {
 }
 
 TEST(MachineTest, Exit) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
 
   // Set mock send result
   SendResult result = 0;
   socket.sendResults.push_back(result);
   socket.sendResults.push_back(result);
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
   // Override exit
   m.onExit = []() {};
   m.Exit();
@@ -301,10 +307,10 @@ TEST(MachineTest, Exit) {
 }
 
 TEST(MachineTest, Error) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
 
   // Set mock send result
   SendResult result = 0;
@@ -312,7 +318,7 @@ TEST(MachineTest, Error) {
   socket.sendResults.push_back(result);
   socket.sendResults.push_back(result);
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
   // Override exit
   m.onExit = []() {};
   m.Error("AHHHH");
@@ -340,26 +346,27 @@ TEST(MachineTest, Error) {
 }
 
 TEST(MachineTest, AddState) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
 
   // Set mock send result
   SendResult result = 0;
   socket.sendResults.push_back(result);
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
   // TODO Test state is added to the vector of states
   // TODO Test first state becomes initial default
 }
 
 TEST(MachineTest, GotoState) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
-  Machine m(spawner, address, name, socket);
+  Address address(":42002");
+  Address spawner(":42001");
+
+  Machine m(name, socket, address, spawner);
 
   int firstOnEntry = 0;
   int firstOnExit = 0;
@@ -399,16 +406,16 @@ TEST(MachineTest, GotoState) {
 }
 
 TEST(MachineTest, Send) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
 
   // Set mock send result
   SendResult result = 0;
   socket.sendResults.push_back(result);
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
 
   Address destination(":42003");
   m.Send(destination, TEST_MESSAGE);
@@ -423,11 +430,12 @@ TEST(MachineTest, Send) {
 }
 
 TEST(MachineTest, SendAt) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   UDPSocket socket;
-  Machine m(spawner, address, name, socket);
+  Address address(":42002");
+  Address spawner(":42001");
+
+  Machine m(name, socket, address, spawner);
   // Override exit
   m.onExit = []() {};
   m.AddState(std::make_unique<State>(
@@ -454,11 +462,12 @@ TEST(MachineTest, SendAt) {
 }
 
 TEST(MachineTest, SendAfter) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   UDPSocket socket;
-  Machine m(spawner, address, name, socket);
+  Address address(":42002");
+  Address spawner(":42001");
+
+  Machine m(name, socket, address, spawner);
   // Override exit
   m.onExit = []() {};
   m.AddState(std::make_unique<State>(
@@ -483,16 +492,16 @@ TEST(MachineTest, SendAfter) {
 }
 
 TEST(MachineTest, Spawn_Local) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
 
   // Set mock send result
   SendResult result = 0;
   socket.sendResults.push_back(result);
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
   m.Spawn("useless/Useless");
 
   // Check socket send
@@ -505,16 +514,16 @@ TEST(MachineTest, Spawn_Local) {
 }
 
 TEST(MachineTest, Spawn_Remote) {
-  Address spawner(":42001");
-  Address address(":42002");
   std::string name("test/Test");
   MockSocket socket;
+  Address address(":42002");
+  Address spawner(":42001");
 
   // Set mock send result
   SendResult result = 0;
   socket.sendResults.push_back(result);
 
-  Machine m(spawner, address, name, socket);
+  Machine m(name, socket, address, spawner);
   Address destination(TEST_IP, TEST_PORT);
   m.Spawn("useless/Useless", destination);
 

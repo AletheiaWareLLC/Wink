@@ -7,21 +7,19 @@
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+    error() << "Incorrect parameters, expected <address> <spawner>\n"
             << std::flush;
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, "hierarchy/Forrest", socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   m.AddState(std::make_unique<State>(
-      "Leaf1",
-      "",
-      []() {},
-      []() {},
+      "Leaf1", "", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -32,10 +30,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Parent1",
-      "",
-      []() {},
-      []() {},
+      "Parent1", "", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -46,10 +41,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Leaf2",
-      "Parent1",
-      []() {},
-      []() {},
+      "Leaf2", "Parent1", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -60,11 +52,9 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Child2",
-      "Parent1",
+      "Child2", "Parent1",
       []() { info() << "Child2 On Entry\n"
-                    << std::flush; },
-      []() {},
+                    << std::flush; }, []() {},
       std::map<const std::string, Receiver>{
           {"Test",
            [&](const Address &sender, std::istream &args) {
@@ -75,10 +65,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Leaf4",
-      "Child2",
-      []() {},
-      []() {},
+      "Leaf4", "Child2", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -89,10 +76,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Leaf5",
-      "Child2",
-      []() {},
-      []() {},
+      "Leaf5", "Child2", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -103,10 +87,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Parent2",
-      "",
-      []() {},
-      []() {},
+      "Parent2", "", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -117,11 +98,9 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Child3",
-      "Parent2",
+      "Child3", "Parent2",
       []() { info() << "Child3 On Entry\n"
-                    << std::flush; },
-      []() {},
+                    << std::flush; }, []() {},
       std::map<const std::string, Receiver>{
           {"Test",
            [&](const Address &sender, std::istream &args) {
@@ -132,10 +111,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Leaf6",
-      "Child3",
-      []() {},
-      []() {},
+      "Leaf6", "Child3", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -146,11 +122,9 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Child4",
-      "Parent2",
+      "Child4", "Parent2",
       []() { info() << "Child4 On Entry\n"
-                    << std::flush; },
-      []() {},
+                    << std::flush; }, []() {},
       std::map<const std::string, Receiver>{
           {"Test",
            [&](const Address &sender, std::istream &args) {
@@ -161,10 +135,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Leaf7",
-      "Child4",
-      []() {},
-      []() {},
+      "Leaf7", "Child4", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -175,10 +146,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Parent3",
-      "",
-      []() {},
-      []() {},
+      "Parent3", "", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {
@@ -189,10 +157,7 @@ int main(int argc, char **argv) {
       }));
 
   m.AddState(std::make_unique<State>(
-      "Leaf3",
-      "Parent3",
-      []() {},
-      []() {},
+      "Leaf3", "Parent3", []() {}, []() {},
       std::map<const std::string, Receiver>{
           {"",
            [&](const Address &sender, std::istream &args) {

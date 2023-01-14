@@ -8,15 +8,16 @@
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+    error() << "Incorrect parameters, expected <address> <spawner>\n"
             << std::flush;
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, "family/Parent", socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -26,7 +27,9 @@ int main(int argc, char **argv) {
       // On Entry Action
       [&]() {
         info() << "Parent: OnEntry\n" << std::flush;
-        m.Spawn("family/Child");
+        // Spawn two identical children, differentiated by a tag
+        m.Spawn("family/Child:Alice");
+        m.Spawn("family/Child:Bob");
       },
       // On Exit Action
       []() { info() << "Parent: OnExit\n"
@@ -63,7 +66,7 @@ int main(int argc, char **argv) {
              args >> child;
              info() << "Parent: " << sender << ' ' << child << " has exited\n"
                     << std::flush;
-             m.GotoState("main"); // Retry
+             m.Spawn(child); // Retry
            }},
       }));
 

@@ -17,6 +17,7 @@
 #include <Wink/constants.h>
 #include <Wink/log.h>
 #include <Wink/machine.h>
+#include <Wink/semver.h>
 #include <Wink/socket.h>
 
 class Server {
@@ -27,7 +28,7 @@ public:
   Server(Server &&m) = delete;
   ~Server() {}
   int Serve(const std::string &directory);
-  int Start(const std::string &machine,
+  int Start(const std::string &binary,
             const std::vector<std::string> &parameters);
   int Stop(int port);
 
@@ -40,5 +41,8 @@ private:
   // Map port number to process identifier
   std::map<ushort, int> pids;
 };
+
+std::string resolveVersion(const std::string &directory,
+                           const std::string &machine);
 
 #endif
