@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
              args >> child;
              info() << "Parent: " << sender << ' ' << child << " has started\n"
                     << std::flush;
-             addresses.insert(child, sender);
+             addresses.emplace(child, sender);
            }},
           {"pulsed",
            [&](const Address &sender, std::istream &args) {
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
              args >> child;
              info() << "Parent: " << sender << ' ' << child << " has exited\n"
                     << std::flush;
-             addresses.remove(child);
+             addresses.erase(child);
              m.Spawn(child); // Retry
            }},
       }));
@@ -87,21 +87,21 @@ int main(int argc, char **argv) {
       // Parent State
       "main",
       // On Entry Action
-      []() {
+      [&]() {
         // Request Button state
-        if (const auto a = addresses.find(reader); a != addresses.end()) {
+        if (const auto &a = addresses.find(reader); a != addresses.end()) {
           std::ostringstream oss;
           oss << "read";
           oss << buttonPin;
-          m.Send(a, oss.str());
+          m.Send(a->second, oss.str());
         }
         // Periodically toggle LED1
         led1on = !led1on;
-        if (const auto a = addresses.find(writer); a != addresses.end()) {
+        if (const auto &a = addresses.find(writer); a != addresses.end()) {
           std::ostringstream oss;
-          oss << led1on ? "high " : "low ";
+          oss << (led1on ? "high " : "low ");
           oss << led1Pin;
-          m.Send(a, oss.str());
+          m.Send(a->second, oss.str());
         }
         // Schedule message to be sent to self after 1s
         m.SendAfter(address, "loop", std::chrono::seconds(1));
@@ -114,15 +114,15 @@ int main(int argc, char **argv) {
            [&](const Address &sender, std::istream &args) {
              int p;
              args >> p;
-             if (const auto a = addresses.find(writer);
+             if (const auto &a = addresses.find(writer);
                  a != addresses.end() && p == buttonPin) {
                // Switch LED2 based on Button state
                int state;
                args >> state;
                std::ostringstream oss;
-               oss << state ? "high " : "low ";
+               oss << (state ? "high " : "low ");
                oss << led2Pin;
-               m.Send(a, oss.str());
+               m.Send(a->second, oss.str());
              }
            }},
           {"loop", [&](const Address &sender,
