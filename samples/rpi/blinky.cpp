@@ -13,10 +13,11 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, "rpi/Blinky", socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   const auto reader = "rpi/GPIOReader";
   const auto writer = "rpi/GPIOWriter";
