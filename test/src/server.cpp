@@ -19,8 +19,8 @@ TEST(ServerTest, Start) {
   Address address(LOCALHOST, SERVER_PORT);
   UDPSocket socket;
   Server server(address, socket);
-  const std::vector<std::string> args;
-  ASSERT_EQ(0, server.Start("./samples/useless/Useless", args));
+  const std::vector<std::string> args{"useless/Useless"};
+  ASSERT_EQ(0, server.Start("./samples/", args));
 }
 
 TEST(ServerTest, Stop) {

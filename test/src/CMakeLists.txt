@@ -10,6 +10,7 @@ set(SOURCE
   "address.cpp"
   "client.cpp"
   "machine.cpp"
+  "semver.cpp"
   "server.cpp"
   "socket.cpp"
   "udp.cpp"

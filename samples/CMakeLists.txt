@@ -17,3 +17,5 @@ add_subdirectory("switch")
 add_subdirectory("time")
 
 add_subdirectory("useless")
+
+add_subdirectory("version")
