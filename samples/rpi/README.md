@@ -2,9 +2,9 @@
 
 This is a collection of samples showing how to use the Wink framework to build and run State Machines on the Raspberry Pi platform.
 
-These samples assume your Raspberry Pi is powered up, connected to your local network, running the latest version of Raspbian OS, and has the latest version of the [WiringPi](http://wiringpi.com/) library installed.
+First, power up your Raspberry Pi, connect it to your local network, update to the latest version of Raspbian OS and install the latest version of the [WiringPi](http://wiringpi.com/) library.
 
-First, clone the Wink repository, build the project, and start the server;
+Then, clone the Wink repository, build the project, and finally start the server;
 ```
 # Clone Wink Repository
 git clone https://github.com/AletheiaWareLLC/Wink.git
@@ -20,11 +20,13 @@ cmake --build build -DBUILD_RPI_SAMPLES=ON
 ./build/src/WinkServer serve build/samples/
 ```
 
+Now that you have ensured everything is working, unplug your Raspberry Pi so you can safely connect up the hardware as described below. Once connected, power up your Raspberry Pi and restart the Wink server.
+
 ## Blinky
 
-The sample has two LEDs and a button, and utilizes three State Machines;
-- GPIOWriter - drives a given GPIO high/low to turn an LED on/off based on the message it receives.
-- GPIOReader - reads a given GPIO to get the state of the button.
+The sample uses two LEDs and a button, driven by a system comprising three State Machines;
+- GPIOWriter - responds to requests to drive a given GPIO high/low to turn an LED on/off.
+- GPIOReader - responds to requests to read a given GPIO to get the state of the button.
 - Blinky - encapsulates the business logic of switching LED1 periodically and controlling LED2 with the Button.
 
 ### Hardware
