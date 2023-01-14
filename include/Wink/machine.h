@@ -16,15 +16,15 @@
 
 class Machine {
 public:
-  Machine(Address &spawner, Address &address, std::string name, Socket &socket)
-      : spawner(spawner), address(address), name(name), socket(socket) {}
+  Machine(std::string name, Socket &socket, Address &address, Address &spawner)
+      : name(name), socket(socket), address(address), spawner(spawner) {}
   Machine(const Machine &m) = delete;
   Machine(Machine &&m) = delete;
   ~Machine() {}
   /**
    * Returns this Machine's Unique Identifier.
    */
-  std::string Uid() const { return uid; }
+  std::string UID() const { return uid; }
   /**
    * Start begins execution of the state machine and sends a
    * 'started' message to the machine which spawned this machine.
@@ -101,12 +101,12 @@ private:
   void registerMachine(const std::string &machine, const int pid);
   void unregisterMachine();
 
-  Address &spawner;
-  Address &address;
   std::string name;
+  Socket &socket;
+  Address &address;
+  Address &spawner;
   std::string uid;
   bool running = true;
-  Socket &socket;
   Address sender;
   char buffer[MAX_PAYLOAD];
   std::map<const std::string, const std::unique_ptr<State>> states;

@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -9,15 +10,16 @@
 
 int main(int argc, char **argv) {
   if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+    error() << "Incorrect parameters, expected <address> <spawner>\n"
             << std::flush;
     return -1;
   }
 
-  Address spawner(argv[1]);
-  Address address(argv[2]);
+  std::string name(argv[0]);
   UDPSocket socket;
-  Machine m(spawner, address, "family/Child", socket);
+  Address address(argv[1]);
+  Address spawner(argv[2]);
+  Machine m(name, socket, address, spawner);
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -25,11 +27,17 @@ int main(int argc, char **argv) {
       // Parent State
       "",
       // On Entry Action
-      [&]() { m.Error("AHHHHH"); },
+      [&]() {
+        // Schedule message to be sent to self after 10s
+        m.SendAfter(address, "error", std::chrono::seconds(10));
+      },
       // On Exit Action
       []() {},
       // Receivers
-      std::map<const std::string, Receiver>{}));
+      std::map<const std::string, Receiver>{
+          {"error", [&](const Address &sender,
+                        std::istream &args) { m.Error("AHHHHH"); }},
+      }));
 
   m.Start();
 }

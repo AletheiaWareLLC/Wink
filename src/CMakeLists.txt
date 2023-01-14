@@ -8,6 +8,7 @@ set(LIBRARY_SOURCES
   "client.cpp"
   "log.cpp"
   "machine.cpp"
+  "semver.cpp"
   "udp.cpp"
 )
 

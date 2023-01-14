@@ -1,6 +1,6 @@
 # Family
 
-Demonstrates how a parent State Machine can spawn and monitor a child State Machine.
+This sample demonstrates how a parent State Machine can spawn child State Machine, monitor its Lifecycle, and automatically restart the child if it exits.
 
 ## Usage
 

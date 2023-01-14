@@ -1,6 +1,11 @@
 #include <Wink/machine.h>
 
 void Machine::Start(const std::string &initial) {
+  if (states.empty()) {
+    // Nothing to do
+    return;
+  }
+
   // Bind to port
   if (const auto result = socket.Bind(address); result < 0) {
     error() << "Failed to bind to port " << address.port << '\n' << std::flush;
@@ -8,9 +13,9 @@ void Machine::Start(const std::string &initial) {
   }
 
   std::ostringstream oss;
-  oss << address;
-  oss << ' ';
   oss << name;
+  oss << '@';
+  oss << address;
   uid = oss.str();
 
   // Set Receive Timeout
@@ -258,6 +263,8 @@ void Machine::handleMessage(
     std::string name;
     iss >> name;
     spawned.emplace(key, std::make_pair(name, now));
+    // Seek back to start of name to make it available to the message handler.
+    iss.seekg(-name.length(), std::ios_base::cur);
   } else if (m == "exited") {
     spawned.erase(key);
   } else if (m == "pulsed") {

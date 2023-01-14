@@ -56,36 +56,56 @@ int Server::Serve(const std::string &directory) {
       destination.ip = address.ip;
 
       if (const auto port = destination.port; port > 0) {
-        // Stop existing machine on requested port (if any)
+        // Stop existing machine on requested port (if any).
         Stop(port);
       }
 
+      // Split machine into name (directory/file) and tag (if any).
+      std::string name = machine;
+      std::string tag = "";
+      if (const auto i = machine.find(':'); i != std::string::npos) {
+        name = machine.substr(0, i);
+        tag = machine.substr(i);
+      }
+
+      // Resolve correct version (if any).
+      // ie. <name> or <name><version>.
+      name = resolveVersion(directory, name);
+
+      // Resolve binary file.
+      // ie. <directory>/<name> or <directory>/<name><version>.
+      std::filesystem::path binary(directory);
+      binary /= name;
+
+      // Create parameter list
       std::vector<std::string> parameters;
 
-      std::stringstream bs;
-      bs << directory;
-      bs << '/';
-      bs << machine;
-      const auto b = bs.str();
-      parameters.push_back(b);
+      // First parameter is name of the machine, optionally including version
+      // and tag. This will also become the log file name (if enabled).
+      // ie. <name>, <name><version>, <name>:<tag>, or
+      // <name><version>:<tag>.
+      parameters.push_back(name + tag);
 
-      std::stringstream ss;
-      ss << sender;
-      const auto s = ss.str();
-      parameters.push_back(s);
-
+      // Second parameter is the address of the machine.
       std::stringstream as;
       as << destination;
       const auto a = as.str();
       parameters.push_back(a);
 
+      // Third parameter is the address of the spawner.
+      std::stringstream ss;
+      ss << sender;
+      const auto s = ss.str();
+      parameters.push_back(s);
+
+      // Remaining parameters are given by spawner.
       while (iss.good()) {
         std::string p;
         iss >> p;
         parameters.push_back(p);
       }
 
-      if (const auto result = Start(machine, parameters); result < 0) {
+      if (const auto result = Start(binary.string(), parameters); result < 0) {
         error() << "Failed to start process\n" << std::flush;
         return result;
       }
@@ -130,7 +150,7 @@ int Server::Serve(const std::string &directory) {
   return 0;
 }
 
-int Server::Start(const std::string &machine,
+int Server::Start(const std::string &binary,
                   const std::vector<std::string> &parameters) {
   // Fork child process
   pid_t pid;
@@ -142,7 +162,7 @@ int Server::Start(const std::string &machine,
   case 0: {
     // Child runs machine process
     if (!log.empty()) {
-      std::string s(machine);
+      std::string s(parameters.at(0));
       std::replace(s.begin(), s.end(), '/', '_');
       if (const auto result = logToFile(log, s); result < 0) {
         error() << "Failed to setup logging\n" << std::flush;
@@ -164,7 +184,7 @@ int Server::Start(const std::string &machine,
       i++;
     }
 
-    const auto result = execv(args[0], args);
+    const auto result = execv(binary.c_str(), args);
 
     for (i = 0; i < length; i++) {
       delete[] args[i];
@@ -201,4 +221,36 @@ int Server::Stop(int port) {
     pids.erase(port);
   }
   return pid;
+}
+
+std::string resolveVersion(const std::string &directory,
+                           const std::string &machine) {
+  std::filesystem::path binary(directory);
+  binary /= machine;
+
+  if (!std::filesystem::exists(binary)) {
+    // Check if <binary><semver> exists, if so use latest version
+    const auto bin = binary.string();
+    const auto len = bin.length();
+    std::vector<SemVer> versions;
+    const auto directory = binary.parent_path();
+    for (const auto &entry : std::filesystem::directory_iterator{directory}) {
+      if (entry.is_regular_file()) {
+        const auto &entry_path = entry.path().string();
+        if (entry_path.starts_with(bin)) {
+          versions.push_back(SemVer(entry_path.substr(len)));
+        }
+      }
+    }
+    if (!versions.empty()) {
+      sort(versions.begin(), versions.end());
+
+      std::ostringstream ms;
+      ms << machine;
+      // Last element in sorted vector is latest version
+      ms << versions.back();
+      return ms.str();
+    }
+  }
+  return machine;
 }
