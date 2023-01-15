@@ -7,7 +7,9 @@ First, power up your Raspberry Pi, connect it to your local network, update to t
 ```
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install clang cmake wiringpi
+sudo apt-get install -y --no-install-recommends build-essential clang cmake wget
+wget https://project-downloads.drogon.net/wiringpi-latest.deb
+sudo dpkg -i wiringpi-latest.deb
 ```
 
 Then, clone the Wink repository, build the project, and finally start the server;
@@ -49,3 +51,11 @@ From another computer on the same network, run;
 ```
 
 If all goes well, one LED will flash periodically and the other will turn on whenever the button is held down.
+
+## Docker
+
+A Dockerfile exists to ease development of these samples by enabling then to be built and run inside a container.
+
+```
+DOCKER_BUILDKIT=0 docker build . -t winkrpi:latest -f samples/rpi/Dockerfile
+```
