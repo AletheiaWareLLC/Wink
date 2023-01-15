@@ -2,10 +2,6 @@
 
 This directory contains samples of defining State Machines in Wink.
 
-## [Blinky](blinky/README.md)
-
-A State Machine for controlling an LED with a Raspberry Pi.
-
 ## [Echo](echo/README.md)
 
 A State Machine that replies to every message with an identical message.
@@ -29,6 +25,10 @@ Demonstrates different tree shapes of Hierarchical State Machines;
 ## [Network](network/README.md)
 
 Demonstrates how State Machines running in isolated Docker containers can communicate across a Docker network.
+
+## [Raspberry Pi](rpi/README.md)
+
+A collection of samples of using the Wink framework with the Raspberry Pi platform.
 
 ## [Switch](switch/README.md)
 

@@ -1,5 +1,3 @@
-# add_subdirectory("blinky")
-
 add_subdirectory("echo")
 
 add_subdirectory("family")
@@ -11,6 +9,8 @@ add_subdirectory("forward")
 add_subdirectory("hierarchy")
 
 # add_subdirectory("network")
+
+add_subdirectory("rpi")
 
 add_subdirectory("switch")
 

@@ -1,4 +1,4 @@
-name: Docker Image
+name: Docker Images
 
 on:
   push:
@@ -12,5 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --tag wink:latest
+    - name: Build the Docker images
+      run: |
+        docker build . -t wink:latest
+        DOCKER_BUILDKIT=0 docker build . -t winkrpi:latest -f samples/rpi/Dockerfile

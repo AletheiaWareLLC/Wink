@@ -20,8 +20,6 @@ public:
   Address() : ip(LOCALHOST), port(0) {}
   Address(std::string address) { stoa(address); }
   Address(std::string ip, ushort port) : ip(ip), port(port) {}
-  Address(const Address &a) = delete;
-  Address(Address &&a) = delete;
   ~Address() {}
   void stoa(const std::string &address);
   std::string atos() const;
