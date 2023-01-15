@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     while (running) {
       std::this_thread::sleep_for(interval);
       if (running) {
-        m.Send(spawner, "tick");
+        m.Send(spawner, "tick " + name);
       }
     }
   });
