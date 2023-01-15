@@ -49,3 +49,14 @@ send <stopwatch> start
 send <stopwatch> stop
 
 ```
+
+## Ticker
+
+Implements a Ticker which sends the spawner a `tick` message periodically.
+
+### Usage
+
+```
+start time/Ticker 2 # Receive tick every 2 seconds
+send <ticker> exit
+```
