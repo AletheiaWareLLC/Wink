@@ -13,5 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker images
-      run: docker build . -t wink:latest
-      run: DOCKER_BUILDKIT=0 docker build . -t winkrpi:latest -f samples/rpi/Dockerfile
+      run:
+        - docker build . -t wink:latest
+        - DOCKER_BUILDKIT=0 docker build . -t winkrpi:latest -f samples/rpi/Dockerfile
