@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+#include <wiringPi.h>
+
 #include <Wink/address.h>
 #include <Wink/machine.h>
 #include <Wink/state.h>
@@ -19,16 +21,17 @@ int main(int argc, char **argv) {
   Address spawner(argv[2]);
   Machine m(name, socket, address, spawner);
 
-  const auto reader = "rpi/GPIOReader";
-  const auto writer = "rpi/GPIOWriter";
+  const auto buttonReader = "rpi/GPIOReader:button";
+  const auto led1Writer = "rpi/GPIOWriter:led1";
+  const auto led2Writer = "rpi/GPIOWriter:led2";
 
-  const auto buttonPin = 10;
-  const auto led1Pin = 11;
-  const auto led2Pin = 12;
+  const auto buttonPin = 17;
+  const auto led1Pin = 18;
+  const auto led2Pin = 23;
 
   auto led1on = false;
 
-  std::map<const std::string, const Address &> addresses;
+  std::map<const std::string, const Address > addresses;
 
   m.AddState(std::make_unique<State>(
       // State Name
@@ -37,8 +40,9 @@ int main(int argc, char **argv) {
       "",
       // On Entry Action
       [&]() {
-        m.Spawn(reader);
-        m.Spawn(writer);
+        m.Spawn(buttonReader, std::vector<std::string>{std::to_string(buttonPin), std::to_string(PUD_UP)});
+        m.Spawn(led1Writer, std::vector<std::string>{std::to_string(led1Pin)});
+        m.Spawn(led2Writer, std::vector<std::string>{std::to_string(led2Pin)});
         m.GotoState("loop");
       },
       // On Exit Action
@@ -88,23 +92,14 @@ int main(int argc, char **argv) {
       "main",
       // On Entry Action
       [&]() {
-        for (const auto &a : addresses) {
-          info() << "Address: " << a->first << '@' << a->second <<'\n' << std::flush;
-        }
         // Request Button state
-        if (const auto &a = addresses.find(reader); a != addresses.end()) {
-          std::ostringstream oss;
-          oss << "read";
-          oss << buttonPin;
-          m.Send(a->second, oss.str());
+        if (const auto &a = addresses.find(buttonReader); a != addresses.end()) {
+          m.Send(a->second, "read");
         }
         // Periodically toggle LED1
         led1on = !led1on;
-        if (const auto &a = addresses.find(writer); a != addresses.end()) {
-          std::ostringstream oss;
-          oss << (led1on ? "high " : "low ");
-          oss << led1Pin;
-          m.Send(a->second, oss.str());
+        if (const auto &a = addresses.find(led1Writer); a != addresses.end()) {
+          m.Send(a->second, (led1on ? "high" : "low"));
         }
         // Schedule message to be sent to self after 1s
         m.SendAfter(address, "loop", std::chrono::seconds(1));
@@ -117,15 +112,12 @@ int main(int argc, char **argv) {
            [&](const Address &sender, std::istream &args) {
              int p;
              args >> p;
-             if (const auto &a = addresses.find(writer);
+             if (const auto &a = addresses.find(led2Writer);
                  a != addresses.end() && p == buttonPin) {
                // Switch LED2 based on Button state
                int state;
                args >> state;
-               std::ostringstream oss;
-               oss << (state ? "high " : "low ");
-               oss << led2Pin;
-               m.Send(a->second, oss.str());
+               m.Send(a->second, (state ? "high" : "low"));
              }
            }},
           {"loop", [&](const Address &sender,

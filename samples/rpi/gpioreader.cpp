@@ -9,8 +9,8 @@
 #include <Wink/state.h>
 
 int main(int argc, char **argv) {
-  if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+  if (argc < 4) {
+    error() << "Incorrect parameters, expected <spawner> <address> <pin> <pud>\n"
             << std::flush;
     return -1;
   }
@@ -21,23 +21,29 @@ int main(int argc, char **argv) {
   Address spawner(argv[2]);
   Machine m(name, socket, address, spawner);
 
+  wiringPiSetupGpio();
+
+  int pin = std::stoi(argv[3]);
+  pinMode(pin, INPUT);
+  int pud = PUD_OFF;
+  if (argc > 4) {
+    pud = std::stoi(argv[4]);
+  }
+  pullUpDnControl(pin, pud);
+
   m.AddState(std::make_unique<State>(
       // State Name
       "main",
       // Parent State
       "",
       // On Entry Action
-      []() { wiringPiSetupGpio(); },
+      []() {},
       // On Exit Action
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
           {"read",
            [&](const Address &sender, std::istream &args) {
-             int pin;
-             args >> pin;
-             pinMode(pin, INPUT);
-
              std::ostringstream oss;
              oss << "gpio ";
              oss << pin;

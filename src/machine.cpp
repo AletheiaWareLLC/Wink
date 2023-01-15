@@ -263,8 +263,9 @@ void Machine::handleMessage(
     std::string name;
     iss >> name;
     spawned.emplace(key, std::make_pair(name, now));
-    // Seek back to start of name to make it available to the message handler.
-    iss.seekg(-name.length(), std::ios_base::cur);
+    // Reset iss to start of name to make it available to the message handler.
+    iss = std::istringstream(buffer);
+    iss >> m;
   } else if (m == "exited") {
     spawned.erase(key);
   } else if (m == "pulsed") {

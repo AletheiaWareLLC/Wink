@@ -9,8 +9,8 @@
 #include <Wink/state.h>
 
 int main(int argc, char **argv) {
-  if (argc < 3) {
-    error() << "Incorrect parameters, expected <spawner> <address>\n"
+  if (argc < 4) {
+    error() << "Incorrect parameters, expected <spawner> <address> <pin>\n"
             << std::flush;
     return -1;
   }
@@ -21,30 +21,29 @@ int main(int argc, char **argv) {
   Address spawner(argv[2]);
   Machine m(name, socket, address, spawner);
 
+  wiringPiSetupGpio();
+
+  int pin = std::stoi(argv[3]);
+  pinMode(pin, INPUT);
+
   m.AddState(std::make_unique<State>(
       // State Name
       "main",
       // Parent State
       "",
       // On Entry Action
-      []() { wiringPiSetupGpio(); },
+      []() {},
       // On Exit Action
       []() {},
       // Receivers
       std::map<const std::string, Receiver>{
           {"high",
            [&](const Address &sender, std::istream &args) {
-             int pin;
-             args >> pin;
-             pinMode(pin, OUTPUT);
              digitalWrite(pin, HIGH);
              info() << "GPIO " << pin << " is HIGH\n" << std::flush;
            }},
           {"low",
            [&](const Address &sender, std::istream &args) {
-             int pin;
-             args >> pin;
-             pinMode(pin, OUTPUT);
              digitalWrite(pin, LOW);
              info() << "GPIO " << pin << " is LOW\n" << std::flush;
            }},
