@@ -48,4 +48,8 @@ include_directories(${INCLUDE_DIR})
 
 add_executable(${TARGET_NAME} ${SOURCE})
 
+find_package(Threads)
+
+target_link_libraries(${TARGET_NAME} ${CMAKE_THREAD_LIBS_INIT})
+
 target_link_libraries(${TARGET_NAME} ${LIBRARY_NAME})
