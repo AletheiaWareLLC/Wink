@@ -10,8 +10,9 @@
 
 int main(int argc, char **argv) {
   if (argc < 4) {
-    error() << "Incorrect parameters, expected <spawner> <address> <pin> <pud>\n"
-            << std::flush;
+    error()
+        << "Incorrect parameters, expected <spawner> <address> <pin> <pud>\n"
+        << std::flush;
     return -1;
   }
 
