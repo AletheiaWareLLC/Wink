@@ -262,12 +262,19 @@ void Machine::handleMessage(
     // Start tracking spawned health
     std::string name;
     iss >> name;
+    addresses.emplace(name, sender);
     spawned.emplace(key, std::make_pair(name, now));
     // Reset iss to start of name to make it available to the message handler.
     iss = std::istringstream(buffer);
     iss >> m;
   } else if (m == "exited") {
+    std::string name;
+    iss >> name;
+    addresses.erase(name);
     spawned.erase(key);
+    // Reset iss to start of name to make it available to the message handler.
+    iss = std::istringstream(buffer);
+    iss >> m;
   } else if (m == "pulsed") {
     if (auto it = spawned.find(key); it != spawned.end()) {
       it->second.second = now;

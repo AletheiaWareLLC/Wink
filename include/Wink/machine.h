@@ -86,6 +86,14 @@ public:
   void Spawn(const std::string &machine, const Address &address,
              const std::vector<std::string> &args);
 
+  /**
+   * Holds the addresses of all living children.
+   */
+  std::map<const std::string, const Address> addresses;
+
+  /**
+   * Called to exit the program, overwriteable for testing.
+   */
   std::function<void()> onExit = []() { _exit(0); };
 
 private:
