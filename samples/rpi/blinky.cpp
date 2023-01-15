@@ -88,6 +88,9 @@ int main(int argc, char **argv) {
       "main",
       // On Entry Action
       [&]() {
+        for (const auto &a : addresses) {
+          info() << "Address: " << a->first << '@' << a->second <<'\n' << std::flush;
+        }
         // Request Button state
         if (const auto &a = addresses.find(reader); a != addresses.end()) {
           std::ostringstream oss;
