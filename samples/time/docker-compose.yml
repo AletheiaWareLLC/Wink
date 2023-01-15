@@ -12,6 +12,8 @@ services:
       - "64000:64000/udp"
       - "64001:64001/udp"
       - "64002:64002/udp"
+      - "64003:64003/udp"
+      - "64004:64004/udp"
     networks:
       winknet:
         ipv4_address: 10.0.0.2
@@ -34,6 +36,8 @@ services:
         sleep 1
         ./build/src/Wink send 10.0.0.2:64002 stop
         ./build/src/Wink send 10.0.0.2:64002 exit
+        ./build/src/Wink start -a 10.0.0.4:42001 time/Ticker:fast 10.0.0.2:64003 2
+        ./build/src/Wink start -a 10.0.0.4:42001 time/Ticker:slow 10.0.0.2:64004 20
     expose:
       - "42001:42001/udp"
     networks:

@@ -52,8 +52,8 @@ TEST(MachineTest, Start) {
     socket.receiveResults.push_back(result);
   }
 
-  int mainOnEntry;
-  int mainOnExit;
+  int mainOnEntry = 0;
+  int mainOnExit = 0;
 
   Machine m(name, socket, address, spawner);
   // Override exit
@@ -166,10 +166,10 @@ TEST(MachineTest, Start_InitialState) {
     socket.receiveResults.push_back(result);
   }
 
-  int firstOnEntry;
-  int firstOnExit;
-  int secondOnEntry;
-  int secondOnExit;
+  int firstOnEntry = 0;
+  int firstOnExit = 0;
+  int secondOnEntry = 0;
+  int secondOnExit = 0;
 
   Machine m(name, socket, address, spawner);
   // Override exit
